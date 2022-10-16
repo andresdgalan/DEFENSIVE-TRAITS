@@ -3,6 +3,25 @@ title: "Defensive Traits"
 author: "Andrés Delgado"
 date: "8/10/2022"
 output: html_document
+bibliography: references.json
 ---
 
 This is my first attempt to write an Rmarkdown manuscript
+
+```{r}
+#Library
+remotes::install_github("paleolimbot/rbbt") # To connect rstudio with zotero
+library(rbbt)
+
+```
+
+
+## Introduction
+I will start my citing any random paper @gomez-aparicioApplyingPlantFacilitation2004; @parkerPhylogeneticStructureHost2015
+
+## Material and Methods
+
+## References
+
+
+

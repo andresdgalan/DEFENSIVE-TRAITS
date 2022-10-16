@@ -58,6 +58,28 @@ if (window.hljs) {
 
 
 
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 
 
@@ -176,6 +198,29 @@ pre code {
 
 
 <p>This is my first attempt to write an Rmarkdown manuscript</p>
+<pre class="r"><code>#Library
+remotes::install_github(&quot;paleolimbot/rbbt&quot;) # To connect rstudio with zotero</code></pre>
+<pre><code>## Skipping install of &#39;rbbt&#39; from a github remote, the SHA1 (7c76fcca) has not changed since last install.
+##   Use `force = TRUE` to force installation</code></pre>
+<pre class="r"><code>library(rbbt)</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>I will start my citing any random paper <span class="citation">Gómez-Aparicio et al. (2004)</span>; <span class="citation">Parker et al. (2015)</span></p>
+</div>
+<div id="material-and-methods" class="section level2">
+<h2>Material and Methods</h2>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-gomez-aparicioApplyingPlantFacilitation2004" class="csl-entry">
+Gómez-Aparicio, Lorena, Regino Zamora, Jose M. Gómez, Jose A. Hódar, Jorge Castro, and Elena Baraza. 2004. <span>“Applying Plant Facilitation to Forest Restoration: A Meta-Analysis of the Use of Shrubs as Nurse Plants.”</span> <em>Ecological Applications</em> 14 (4): 1128–38. <a href="https://doi.org/10.1890/03-5084">https://doi.org/10.1890/03-5084</a>.
+</div>
+<div id="ref-parkerPhylogeneticStructureHost2015" class="csl-entry">
+Parker, Ingrid M., Megan Saunders, Megan Bontrager, Andrew P. Weitz, Rebecca Hendricks, Roger Magarey, Karl Suiter, and Gregory S. Gilbert. 2015. <span>“Phylogenetic Structure and Host Abundance Drive Disease Pressure in Communities.”</span> <em>Nature</em> 520 (7548): 542–44. <a href="https://doi.org/10.1038/nature14372">https://doi.org/10.1038/nature14372</a>.
+</div>
+</div>
+</div>
 
 
 
