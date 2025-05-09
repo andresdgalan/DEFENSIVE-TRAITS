@@ -1,0 +1,145 @@
+---
+title: "Rasgos Funcionales Invernadero SIBECOL 2025"
+author: "Andrés Delgado Galán"
+date: "2025-05-09"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r LOADING DATA AND PACKAGES, include=FALSE}
+
+library(dplyr)
+library(DHARMa)
+library(ggplot2)
+library(ggeffects)
+library(cowplot)
+library(kableExtra)
+library(tibble)
+library(knitr)
+library(emmeans)
+library(car)
+
+data <- read.table("rawdata/datos_sibecol_2025.csv", header = TRUE, sep = ";")
+datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
+```
+
+```{r PRE-ANALYSIS Data PREPARATION, include=FALSE}
+#hacemos una matriz para cada especie
+AVdata <- data |> filter(sp == "AV")
+HOdata <- data |> filter(sp == "HO")
+MEdata <- data |> filter(sp == "ME")
+PLdata <- data |> filter(sp == "PL")
+CAdata <- data |> filter(sp == "CA")
+```
+
+##### A.barbata - PRODUCCIÓN DE FLORES
+
+```{r AVflor Model, include=FALSE}
+#filtramos las filas con datos de nº de flores
+AVdata.flor <- subset(AVdata, !is.na(flor))
+
+#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
+AVflormodel <- lm(sqrt(flor) ~ trat + clip + trat:clip, data = AVdata.flor, na.action = na.fail)
+
+sample_size <- nrow(AVdata.flor)
+# Extract the formula from the model
+model_formula <- formula(AVflormodel)
+# Convert formula to character and clean up
+model_formula_clean <- deparse(model_formula)
+```
+
+**`r model_formula_clean`**\
+n = **`r sample_size`**
+
+```{r DHARMA AVflor: checking residuals, echo=FALSE, fig.show='hide'}
+residuals <- simulateResiduals(fittedModel = AVflormodel)
+plot(residuals)
+```
+
+```{r SUMMARY OF AVflor MODEL, include=FALSE}
+summary <- summary(AVflormodel)
+rsq <- summary$adj.r.squared
+rsq
+```
+
+R² = **`r rsq`**
+
+```{r ANOVA OF height_Grazer MODEL, include=FALSE}
+anova_flor <- Anova(AVflormodel, type = 2, test.statistic = "F")
+anova_flor
+```
+
+```{r AVflor Post-hoc Comparisons with Tukeys HSD, echo=FALSE, include=FALSE}
+# This will compare treatment levels within each level of grazer
+posthoc_trat <- emmeans(AVflormodel, pairwise ~ trat | clip, adjust = "tukey")
+print(posthoc_trat)
+
+# This will compare grazer levels within each treatment
+posthoc_clip <- emmeans(AVflormodel, pairwise ~ clip | trat, adjust = "tukey")
+print(posthoc_clip)
+
+# Visualizing results
+
+# Plot treatment differences within each grazer
+plot(posthoc_trat$emmeans)  
+
+# Plot grazer differences within each treatment
+plot(posthoc_clip$emmeans)
+
+```
+
+```{r ANOVA AVflor, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+# Convert the ANOVA results to a data frame and create a styled table
+
+anova_flor %>%
+  as.data.frame() %>%
+  rownames_to_column("Predictor") %>%
+  mutate(
+    Significance = case_when(
+      `Pr(>F)` < 0.001 ~ "***",
+      `Pr(>F)` < 0.01 ~ "**",
+      `Pr(>F)` < 0.05 ~ "*",
+      TRUE ~ ""  # No asterisk for p > 0.05
+    ),
+    Predictor_with_significance = paste(Predictor, Significance, sep = " ")
+  ) %>%
+  select(-Predictor, -Significance) %>%  # Removes Df.res and Significance columns
+  rename(Predictor = Predictor_with_significance) %>%  # Renames column
+  mutate(
+    # Round all numeric columns to 3 decimal points
+    across(where(is.numeric), ~ round(., 3)),
+    # Add the new column 'Response' with "Diversity" in all rows
+    Response = "AV flor"
+  ) %>%
+  select(Response, Predictor, everything()) %>%  # Moves Response to the first column
+  kable("html", caption = "ANOVA Results for AVflor Model") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"), 
+    full_width = FALSE
+  ) %>%
+  column_spec(1, background = "lightgray", bold = TRUE, width = "5em") %>%  # Style Response
+  column_spec(2, width = "10em")  # Adjust width of Predictor column
+
+
+```
+
+```{r PLOTTING AV flor, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+#miramos la distribución de la variable respuesta agrupando por tratamientos
+# Create a new grouping variable
+AVdata <- AVdata %>%
+  mutate(group = interaction(trat, clip, sep = "_"))
+
+ggplot(AVdata, aes(x = group, y = flor, color = trat, shape = clip)) +
+  geom_violin(aes(fill = trat), alpha = 0.4, color = NA) +
+  geom_jitter(width = 0.1, alpha = 0.8, size = 2) +
+  labs(title = "AV flor",
+       x = "Treatment + Clipping",
+       y = "flor",
+       color = "Tratamiento",
+       shape = "Clipping",
+       fill = "Treatment") +
+  theme_minimal()
+
+
+```
