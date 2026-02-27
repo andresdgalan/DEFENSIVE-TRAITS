@@ -1,0 +1,395 @@
+---
+title: "PLOTTING DEFENSIVE TRAITS SIBECOL 2025"
+author: "Andrés Delgado Galán"
+date: "2025-05-23"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r LOADING DATA AND PACKAGES, include=FALSE}
+
+library(ggplot2)
+library(viridis)
+library(hrbrthemes)
+library(scales)
+library(dplyr)
+library(here)
+
+setwd(here())
+data <- read.table("rawdata/datos_sibecol_2025.csv", header = TRUE, sep = ";")
+```
+
+```{r REMOVING OUTLIERS, include=FALSE}
+data <- data[!(data$SLA %in% tail(sort(data$SLA), 3)), ]
+```
+
+```{r FUNCTION FOR PLOTTING, include=FALSE}
+plot_variable <- function(variable, y_label) {
+  # Subset data to remove species with all NA for this variable
+  filtered_data <- data %>%
+    filter(!is.na(.data[[variable]])) %>%
+    droplevels()
+
+  ggplot(filtered_data, aes_string(x = "sp", y = variable, fill = "trat")) +
+    geom_boxplot(outlier.shape = NA) +
+    scale_fill_manual(
+      values = c("gra" = alpha("#FF10F0", 0.5), "ex" = alpha("#006400", 0.5)),
+      breaks = c("ex", "gra"),
+      labels = c("Ungrazed", "Grazed")
+    ) +
+    geom_jitter(color = "black", size = 0.4, alpha = 0.9,
+      position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)) +
+    theme_ipsum() +
+    theme(
+      axis.text.x = element_text(angle = 45, vjust = 0.5, size = 14, face = "italic"),
+      axis.title.y = element_text(size = 14, hjust = 0.5, margin = margin(r = 15)),
+      legend.title = element_text(size = 14),
+      legend.text = element_text(size = 12),
+      plot.title = element_blank()
+    ) +
+    xlab("") +
+    ylab(y_label) +
+    labs(fill = "Maternal environment") +
+    scale_x_discrete(
+      labels = c("AV" = "A.barbata", "CA" = "C.arvensis", "HO" = "H.murinum", "ME" = "M.polymorpha", "PL" = "P.lagopus")
+    )
+}
+```
+
+## TRANSGENERATIONAL EFFECT OF GRAZING
+
+```{r PLOTTING ALL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+plot_variable("SLA", "Specific Leaf Area (cm²/g)")
+plot_variable("fenoles", "Leaf fenolics phenolics (mg/g)")
+plot_variable("dias_flor", "Days to flowering")
+plot_variable("PhiPS2", "ΦPSII")
+```
+
+## REAL-TIME HERBIVORY SIMULATION
+
+```{r PLOTTING SLA, echo=FALSE, results='hold', warning=FALSE, message=FALSE, fig.width=6.2, fig.height=5}
+# First, modify your data to keep 'clip' as is, and set others to NA or "other"
+plot_data <- data %>%
+  mutate(
+    fill_group = case_when(
+      sp == "AV" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "AV" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+      sp == "PL" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "PL" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+      sp == "CA" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "CA" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+      trat == "ex" ~ "ex",
+      trat == "gra" ~ "gra",
+      TRUE ~ NA_character_
+    )
+  )
+
+ggplot(plot_data, aes(x = sp, y = SLA)) +
+  geom_boxplot(
+    aes(fill = fill_group),
+    outlier.shape = NA   
+  ) +
+  geom_jitter(
+    aes(fill = fill_group),
+    color = "black",
+    size = 0.4,
+    alpha = 0.9,
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "ex" = alpha("#006400", 0.5),
+      "gra" = alpha("#FF10F0", 0.5),
+      "gra_clip_yes" = "yellow",
+      "gra_clip_no" = "#56B4E9"
+    ),
+    labels = c(
+      "ex" = "Ungrazed",
+      "gra" = "Grazed",
+      "gra_clip_yes" = "Clipped",
+      "gra_clip_no" = "Unclipped"
+    ),
+    breaks = c("ex", "gra", "gra_clip_no", "gra_clip_yes"),
+    guide = guide_legend(
+      override.aes = list(shape = 22),
+      title = NULL
+    )
+  ) +
+  guides(
+    fill = guide_legend(
+      title = NULL,
+      label.position = "right"
+    )
+  ) +
+  theme_ipsum() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5, size = 14, face = "italic"),
+    axis.title.y = element_text(size = 14, hjust = 0.5, margin = margin(r = 15)),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = "right",
+    plot.title = element_blank()
+  ) +
+  xlab("") +
+  ylab("Specific Leaf Area (cm²/g)") +
+  scale_x_discrete(
+    labels = c(
+      "AV" = "A.barbata",
+      "CA" = "C.arvensis",
+      "HO" = "H.murinum",
+      "ME" = "M.polymorpha",
+      "PL" = "P.lagopus"
+    )
+  ) +
+  labs(fill = NULL)
+
+
+
+
+
+
+```
+
+
+```{r PLOTTING fenoles, echo=FALSE, results='hold', warning=FALSE, message=FALSE, fig.width=6.2, fig.height=5}
+plot_data <- data %>%
+  mutate(
+    fill_group = case_when(
+      sp == "PL" & clip == "yes" ~ "clip_yes",
+      sp == "PL" & clip == "no"  ~ "clip_no",
+      sp != "PL" & trat == "ex"  ~ "ex",
+      sp != "PL" & trat == "gra" ~ "gra",
+      TRUE ~ NA_character_
+    )
+  )
+
+ggplot(plot_data, aes(x = sp, y = fenoles)) +
+  geom_boxplot(
+    aes(fill = fill_group),
+    outlier.shape = NA
+  ) +
+  geom_jitter(
+    aes(fill = fill_group),
+    color = "black",
+    size = 0.4,
+    alpha = 0.9,
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "ex" = alpha("#006400", 0.5),
+      "gra" = alpha("#FF10F0", 0.5),
+      "clip_yes" = "yellow",
+      "clip_no" = "#56B4E9"
+    ),
+    labels = c(
+      "ex" = "Ungrazed",
+      "gra" = "Grazed",
+      "clip_yes" = "Clipped",
+      "clip_no" = "Unclipped"
+    ),
+    breaks = c("ex", "gra", "clip_no", "clip_yes"),
+    guide = guide_legend(override.aes = list(shape = 22), title = NULL)
+  ) +
+  guides(
+    fill = guide_legend(
+      title = NULL,
+      label.position = "right"
+    )
+  ) +
+  theme_ipsum() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5, size = 14, face = "italic"),
+    axis.title.y = element_text(size = 14, hjust = 0.5, margin = margin(r = 15)),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = "right",
+    plot.title = element_blank()
+  ) +
+  xlab("") +
+  ylab("Leaf phenolics (mg/g)") +
+  scale_x_discrete(
+    labels = c(
+      "AV" = "A.barbata",
+      "CA" = "C.arvensis",
+      "HO" = "H.murinum",
+      "ME" = "M.polymorpha",
+      "PL" = "P.lagopus"
+    )
+  ) +
+  labs(fill = NULL)
+
+```
+
+```{r PLOTTING dias_flor, echo=FALSE, results='hold', warning=FALSE, message=FALSE, fig.width=6.2, fig.height=5}
+# First, modify your data to keep 'clip' as is, and set others to NA or "other"
+plot_data <- data %>%
+  mutate(
+    fill_group = case_when(
+      sp == "HO" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "HO" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+      sp == "ME" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "ME" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+
+      trat == "ex" ~ "ex",
+      trat == "gra" ~ "gra",
+      TRUE ~ NA_character_
+    )
+  )
+
+ggplot(plot_data, aes(x = sp, y = dias_flor)) +
+  geom_boxplot(
+    aes(fill = fill_group),
+    outlier.shape = NA   
+  ) +
+  geom_jitter(
+    aes(fill = fill_group),
+    color = "black",
+    size = 0.4,
+    alpha = 0.9,
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "ex" = alpha("#006400", 0.5),
+      "gra" = alpha("#FF10F0", 0.5),
+      "gra_clip_yes" = "yellow",
+      "gra_clip_no" = "#56B4E9"
+    ),
+    labels = c(
+      "ex" = "Ungrazed",
+      "gra" = "Grazed",
+      "gra_clip_yes" = "Clipped",
+      "gra_clip_no" = "Unclipped"
+    ),
+    breaks = c("ex", "gra", "gra_clip_no", "gra_clip_yes"),
+    guide = guide_legend(
+      override.aes = list(shape = 22),
+      title = NULL
+    )
+  ) +
+  guides(
+    fill = guide_legend(
+      title = NULL,
+      label.position = "right"
+    )
+  ) +
+  theme_ipsum() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5, size = 14, face = "italic"),
+    axis.title.y = element_text(size = 14, hjust = 0.5, margin = margin(r = 15)),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = "right",
+    plot.title = element_blank()
+  ) +
+  xlab("") +
+  ylab("Days for flowering") +
+  scale_x_discrete(
+    labels = c(
+      "AV" = "A.barbata",
+      "CA" = "C.arvensis",
+      "HO" = "H.murinum",
+      "ME" = "M.polymorpha",
+      "PL" = "P.lagopus"
+    )
+  ) +
+  labs(fill = NULL)
+
+
+
+
+
+
+```
+
+
+```{r PLOTTING PhiPS2, echo=FALSE, results='hold', warning=FALSE, message=FALSE, fig.width=6.2, fig.height=5}
+# First, modify your data to keep 'clip' as is, and set others to NA or "other"
+plot_data <- data %>%
+  mutate(
+    fill_group = case_when(
+      sp == "HO" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "HO" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+      sp == "PL" & trat == "gra" & clip == "yes" ~ "gra_clip_yes",
+      sp == "PL" & trat == "gra" & clip == "no"  ~ "gra_clip_no",
+
+
+      trat == "ex" ~ "ex",
+      trat == "gra" ~ "gra",
+      TRUE ~ NA_character_
+    )
+  )
+
+ggplot(plot_data, aes(x = sp, y = PhiPS2)) +
+  geom_boxplot(
+    aes(fill = fill_group),
+    outlier.shape = NA   
+  ) +
+  geom_jitter(
+    aes(fill = fill_group),
+    color = "black",
+    size = 0.4,
+    alpha = 0.9,
+    position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)
+  ) +
+  scale_fill_manual(
+    values = c(
+      "ex" = alpha("#006400", 0.5),
+      "gra" = alpha("#FF10F0", 0.5),
+      "gra_clip_yes" = "yellow",
+      "gra_clip_no" = "#56B4E9"
+    ),
+    labels = c(
+      "ex" = "Ungrazed",
+      "gra" = "Grazed",
+      "gra_clip_yes" = "Clipped",
+      "gra_clip_no" = "Unclipped"
+    ),
+    breaks = c("ex", "gra", "gra_clip_no", "gra_clip_yes"),
+    guide = guide_legend(
+      override.aes = list(shape = 22),
+      title = NULL
+    )
+  ) +
+  guides(
+    fill = guide_legend(
+      title = NULL,
+      label.position = "right"
+    )
+  ) +
+  theme_ipsum() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 0.5, size = 14, face = "italic"),
+    axis.title.y = element_text(size = 14, hjust = 0.5, margin = margin(r = 15)),
+    legend.title = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = "right",
+    plot.title = element_blank()
+  ) +
+  xlab("") +
+  ylab("ΦPSII") +
+  scale_x_discrete(
+    labels = c(
+      "AV" = "A.barbata",
+      "CA" = "C.arvensis",
+      "HO" = "H.murinum",
+      "ME" = "M.polymorpha",
+      "PL" = "P.lagopus"
+    )
+  ) +
+  labs(fill = NULL)
+
+
+
+
+
+
+```
