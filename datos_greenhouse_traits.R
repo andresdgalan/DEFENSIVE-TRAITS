@@ -7,7 +7,7 @@ library(tidyverse)
 library(here)
 
 # MATRIZ DE RASGOS
-data <- read.table(here("rawdata/datos_sibecol_2025.csv"), header = TRUE, sep = ";")
+data <- read.table(here("rawdata/datos_sibecol_2025.csv"), header = TRUE, sep = ",")
 # BIOMASA
 biomasa_frozen <- read.table(here("rawdata/peso_seco_cosecha_congelada.csv"), header = TRUE, sep = ",")
 biomasa_resto <- read.table(here("rawdata/pesos_muerta_semillas_resto_irga.csv"), header = TRUE, sep = ",")
@@ -70,6 +70,7 @@ class(roots$SRL) <- "numeric"
 trait_data <- full_join(data, roots) %>%
   select(-c(full_id, peso_winrhizo, peso_resto, Length.cm., RootVolume.cm3., profundidad_sustrato))
 
+write.table(trait_data, "trait_data.csv", row.names = F, sep = ",")
 
 # VISUALIZAMOS LA DISTRIBUCIÓN DE LAS VARIABLES ----
 
