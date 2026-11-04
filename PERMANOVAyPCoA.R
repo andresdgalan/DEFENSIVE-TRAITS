@@ -13,9 +13,70 @@ library(here)
 
 # datos
 traits <- read.table(here("trait_data.csv"), header =T, sep = ",")%>%
-  select(-c(massmother, flor, fruto, dias_flor, dias_fin_flor, humedad_muerte, seedfruto)) %>%
+  select(-c(massmother, humedad_muerte, seedfruto, flor, seedtotal,
+            dias_fruto, dias_fin_fruto, dias_muerte)) %>%
   rename(Species = sp, Parental = trat)
 
+# FILTRAMOS POR MISSINGNESS
+# PRIMERO QUITAMOS VARIABLES CON POCOS DATOS Y VARIABLES CORRELACIONADAS
+# missingness <- traits %>%
+#        group_by(Species, Parental) %>%
+#        summarise(across(everything(), ~sum(is.na(.))), .groups = "drop")
+# print(as.data.frame(missingness))
+# 
+# sample_size <- traits %>%
+#   group_by(Species, Parental) %>%
+#   summarise(across(everything(), ~sum(!is.na(.))), .groups = "drop")
+# print(as.data.frame(sample_size))
+
+# conjunto core de rasgos 
+# (ejes funcionales distintos, cobertura razonable, evitan redundancias)
+# core <- traits %>%
+#   select(-c(flor, seedtotal, massseed, hojas, altura,
+#             dias_fruto, dias_fin_fruto, dias_muerte,
+#             LDMC, area.m, Conductance, Photosyn, dias_fin_flor,
+#             AvgDiam.mm., RTD))
+
+# Quitamos las filas que tienen menos de 3 datos (+4 metadatos)
+traits <- traits %>%
+       filter(rowSums(!is.na(.)) > 7)
+
+# Calculamos, para cada pareja, el número de rasgos comparables
+n <- nrow(traits)
+
+n <- nrow(X)
+
+shared <- matrix(
+  0,
+  nrow = n,
+  ncol = n
+)
+
+for(i in 1:n){
+  for(j in 1:n){
+    
+    shared[i,j] <- sum(
+      !is.na(X[i,]) &
+        !is.na(X[j,])
+    )
+    
+  }
+}
+
+head(shared)
+
+# Distribución global
+
+shared_upper <- shared[upper.tri(shared)]
+
+summary(shared_upper)
+
+table(shared_upper)
+
+# ELIMINAR FILAS PROBLEMÁTICAS (260)
+which(shared == 0, arr.ind = TRUE)
+
+traits <- traits[-260,]
 
 ############################################################
 # 1. Separar metadatos y rasgos
