@@ -83,7 +83,7 @@ traits <- traits[-260,]
 ############################################################
 
 meta <- traits %>%
-  select(Species, Parental)
+  select(Species, Parental, id)
 
 X <- traits %>%
   select(-c(Species, Parental, id, clip))
@@ -116,11 +116,38 @@ perm <- adonis2(
 
 print(perm)
 
+perm.terms <- adonis2(
+  dist.mat ~ Species * Parental,
+  data = meta,
+  permutations = 999,
+  by = "terms"
+)
+
+print(perm.terms)
+
+perm.margin <- adonis2(
+  dist.mat ~ Species * Parental,
+  data = meta,
+  permutations = 999,
+  by = "margin"
+)
+
+print(perm.margin)
+
+# Multivariate trait composition differed among species (R² = 0.54, p = 0.001), 
+# was weakly affected by parental treatment (R² = 0.015, p = 0.001), 
+# and showed a significant species-specific transgenerational response (Species × Parental: R² = 0.044, p = 0.001).
+
+# Cuando existe una interacción fuerte, los efectos principales 
+# dejan de ser totalmente interpretables por sí mismos. 
+# Por eso adonis2() en muchos casos sólo devuelve 
+# la interacción en by="margin"
+
 ############################################################
 # 5. Comprobar homogeneidad de dispersiones
 ############################################################
 
-# Especie
+# Especie (las especies difieren en su dispersión multivariante)
 
 beta.species <- betadisper(
   dist.mat,
@@ -129,7 +156,10 @@ beta.species <- betadisper(
 
 permutest(beta.species)
 
-# Tratamiento parental
+# Species affected multivariate trait composition (PERMANOVA, p < 0.001, F = 84.3), 
+# although multivariate dispersion also differed among species (betadisper, p < 0.001, F = 19.9).
+
+# Tratamiento parental (los tratamientos no difieren en su dispersión)
 
 beta.parental <- betadisper(
   dist.mat,
@@ -137,6 +167,10 @@ beta.parental <- betadisper(
 )
 
 permutest(beta.parental)
+
+# los efectos del tratamiento parental
+# sse pueden interpretar más tranquilamente como un 
+# desplazamiento de centroides y no como un artefacto de dispersión
 
 ############################################################
 # 6. PCoA
@@ -176,8 +210,9 @@ var2 <- round(
 
 fit <- envfit(
   pcoa.res$vectors[, 1:2],
-  X.scaled,
-  permutations = 999
+  as.data.frame(X.scaled),
+  permutations = 999,
+  na.rm = T
 )
 
 print(fit)
@@ -199,16 +234,16 @@ vec$Trait <- rownames(vec)
 vec$pval <- fit$vectors$pvals
 
 vec.sig <- vec %>%
-  filter(pval <= 0.05)
+  filter(pval < 0.1)
 
 ############################################################
 # 12. Escalar flechas para visualización
 ############################################################
 
-mult <- 2
+mult <- 0.2
 
-vec.sig$Dim1 <- vec.sig$Dim1 * mult
-vec.sig$Dim2 <- vec.sig$Dim2 * mult
+vec.sig$Dim1 <- vec.sig$Axis.1 * mult
+vec.sig$Dim2 <- vec.sig$Axis.2 * mult
 
 ############################################################
 # 13. Gráfico
@@ -229,6 +264,16 @@ ggplot(
     alpha = 0.8
   ) +
   
+  stat_ellipse(
+    aes(
+      colour = Species,
+      linetype = Parental,
+      group = interaction(Species, Parental)
+    ),
+    linewidth = 1,
+    level = 0.95
+  ) +
+  
   geom_segment(
     data = vec.sig,
     aes(
@@ -244,6 +289,12 @@ ggplot(
       length = unit(0.20, "cm")
     )
   ) +
+  scale_linetype_manual(
+    values = c(
+      "ex"  = "solid",
+      "gra" = "dashed"
+    )
+  ) +
   
   geom_text(
     data = vec.sig,
@@ -255,6 +306,12 @@ ggplot(
     inherit.aes = FALSE,
     size = 3.5
   ) +
+  
+  # geom_text(
+  #   aes(label = id),
+  #   size = 2,
+  #   vjust = -0.5
+  # ) +
   
   theme_bw() +
   
@@ -285,8 +342,34 @@ ggsave(
 )
 
 ############################################################
-# 15. Tabla de rasgos significativos
+# 15. Boxplots de rasgos significativos
 ############################################################
 
-vec.sig %>%
-  arrange(pval)
+traits.sig <- rownames(vec.sig)
+
+plot.df <- traits %>%
+  select(Species, all_of(traits.sig)) %>%
+  pivot_longer(
+    cols = all_of(traits.sig),
+    names_to = "Trait",
+    values_to = "Value"
+  )
+
+ggplot(
+  plot.df,
+  aes(
+    x = Species,
+    y = Value,
+    fill = Species
+  )
+) +
+  geom_boxplot() +
+  facet_wrap(~ Trait, scales = "free_y") +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
