@@ -235,7 +235,11 @@ vec$pval <- fit$vectors$pvals
 
 vec.sig <- vec %>%
 <<<<<<< HEAD
+<<<<<<< HEAD
   filter(pval < 0.1)
+=======
+  filter(pval < 0.05)
+>>>>>>> 8fa7208dd8e71c3377a44907fd07af95b1adae50
 =======
   filter(pval < 0.05)
 >>>>>>> 8fa7208dd8e71c3377a44907fd07af95b1adae50
