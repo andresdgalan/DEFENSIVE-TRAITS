@@ -21,6 +21,7 @@ library(emmeans)
 library(car)
 library(scales)
 library(here)
+library(glmmTMB)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -116,8 +117,8 @@ plot_AV_variable <- function(data, response_var) {
 #filtramos las filas con datos de nº de flores
 AVdata.flor <- subset(AVdata, !is.na(flor))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVflormodel <- lm(sqrt(flor) ~ trat + clip + trat:clip, data = AVdata.flor, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVflormodel <- glmmTMB(flor ~ trat + clip + trat:clip, data = AVdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.flor)
 # Extract the formula from the model
@@ -129,7 +130,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVflor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVflor: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVflormodel)
 plot(residuals)
 ```
@@ -143,7 +144,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVflor MODEL, include=FALSE}
-anova_flor <- Anova(AVflormodel, type = 2, test.statistic = "F")
+anova_flor <- Anova(AVflormodel, type = 2)
 anova_flor
 ```
 
@@ -183,10 +184,10 @@ anova_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -222,8 +223,8 @@ plot_AV_variable(AVdata, flor)
 #filtramos las filas con datos de nº de frutoes
 AVdata.fruto <- subset(AVdata, !is.na(fruto))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVfrutomodel <- lm(sqrt(fruto) ~ trat + clip + trat:clip, data = AVdata.fruto, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = AVdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.fruto)
 # Extract the formula from the model
@@ -235,7 +236,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVfruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVfruto, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVfrutomodel)
 plot(residuals)
 ```
@@ -249,7 +250,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVfruto MODEL, include=FALSE}
-anova_fruto <- Anova(AVfrutomodel, type = 2, test.statistic = "F")
+anova_fruto <- Anova(AVfrutomodel, type = 2)
 anova_fruto
 ```
 
@@ -289,10 +290,10 @@ anova_fruto %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -328,8 +329,8 @@ plot_AV_variable(AVdata, fruto)
 #filtramos las filas con datos de nº de hojases
 AVdata.hojas <- subset(AVdata, !is.na(hojas))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVhojasmodel <- lm(sqrt(hojas) ~ trat + clip + trat:clip, data = AVdata.hojas, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = AVdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.hojas)
 # Extract the formula from the model
@@ -341,7 +342,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVhojas: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVhojas, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVhojasmodel)
 plot(residuals)
 ```
@@ -355,7 +356,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVhojas MODEL, include=FALSE}
-anova_hojas <- Anova(AVhojasmodel, type = 2, test.statistic = "F")
+anova_hojas <- Anova(AVhojasmodel, type = 2)
 anova_hojas
 ```
 
@@ -395,10 +396,10 @@ anova_hojas %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -433,8 +434,8 @@ plot_AV_variable(AVdata, hojas)
 #filtramos las filas con datos de nº de alturaes
 AVdata.altura <- subset(AVdata, !is.na(altura))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AValturamodel <- lm(sqrt(altura) ~ trat + clip + trat:clip, data = AVdata.altura, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AValturamodel <- lm((altura) ~ trat + clip + trat:clip, data = AVdata.altura, na.action = na.fail)
 
 sample_size <- nrow(AVdata.altura)
 # Extract the formula from the model
@@ -446,7 +447,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AValtura: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AValtura, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AValturamodel)
 plot(residuals)
 ```
@@ -541,8 +542,8 @@ plot_AV_variable(AVdata, altura)
 AVdata.seedfruto <- subset(AVdata, !is.na(seedfruto))
 AVdata.seedfruto$seedfruto
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVseedfrutomodel <- lm(sqrt(seedfruto) ~ trat + clip + trat:clip, data = AVdata.seedfruto, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = AVdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.seedfruto)
 # Extract the formula from the model
@@ -554,7 +555,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVseedfruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVseedfruto, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVseedfrutomodel)
 plot(residuals)
 ```
@@ -568,7 +569,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVseedfruto MODEL, include=FALSE}
-# anova_seedfruto <- Anova(AVseedfrutomodel, type = 2, test.statistic = "F")
+# anova_seedfruto <- Anova(AVseedfrutomodel, type = 2)
 # anova_seedfruto
 ```
 
@@ -608,10 +609,10 @@ kable(as.data.frame(posthoc_trat$contrasts))
 #   rownames_to_column("Predictor") %>%
 #   mutate(
 #     Significance = case_when(
-#       `Pr(>F)` < 0.001 ~ "***",
-#       `Pr(>F)` < 0.01 ~ "**",
-#       `Pr(>F)` < 0.05 ~ "*",
-#       `Pr(>F)` < 0.1 ~ "·",
+#       `Pr(>Chisq)` < 0.001 ~ "***",
+#       `Pr(>Chisq)` < 0.01 ~ "**",
+#       `Pr(>Chisq)` < 0.05 ~ "*",
+#       `Pr(>Chisq)` < 0.1 ~ "·",
 #       TRUE ~ ""  # No asterisk for p > 0.05
 #     ),
 #     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -647,8 +648,8 @@ plot_AV_variable(AVdata, seedfruto)
 #filtramos las filas con datos de nº de seedtotales
 AVdata.seedtotal <- subset(AVdata, !is.na(seedtotal))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVseedtotalmodel <- lm(sqrt(seedtotal) ~ trat + clip + trat:clip, data = AVdata.seedtotal, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = AVdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.seedtotal)
 # Extract the formula from the model
@@ -660,7 +661,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVseedtotal: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVseedtotal, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVseedtotalmodel)
 plot(residuals)
 ```
@@ -674,7 +675,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVseedtotal MODEL, include=FALSE}
-anova_seedtotal <- Anova(AVseedtotalmodel, type = 2, test.statistic = "F")
+anova_seedtotal <- Anova(AVseedtotalmodel, type = 2)
 anova_seedtotal
 ```
 
@@ -714,10 +715,10 @@ anova_seedtotal %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -753,8 +754,8 @@ plot_AV_variable(AVdata, seedtotal)
 #filtramos las filas con datos de nº de massseedes
 AVdata.massseed <- subset(AVdata, !is.na(massseed))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVmassseedmodel <- lm(sqrt(massseed) ~ trat + clip + trat:clip, data = AVdata.massseed, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = AVdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(AVdata.massseed)
 # Extract the formula from the model
@@ -766,7 +767,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVmassseed: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVmassseed, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVmassseedmodel)
 plot(residuals)
 ```
@@ -858,8 +859,8 @@ plot_AV_variable(AVdata, massseed)
 #filtramos las filas con datos de nº de SLAes
 AVdata.SLA <- subset(AVdata, !is.na(SLA))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVSLAmodel <- lm(sqrt(SLA) ~ trat + clip + trat:clip, data = AVdata.SLA, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVSLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = AVdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(AVdata.SLA)
 # Extract the formula from the model
@@ -871,7 +872,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVSLA: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVSLA, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVSLAmodel)
 plot(residuals)
 ```
@@ -974,8 +975,8 @@ AVdata.LDMC <- AVdata.LDMC[AVdata.LDMC$id!= 241, ]
 
 
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVLDMCmodel <- lm(sqrt(LDMC) ~ trat + clip + trat:clip, data = AVdata.LDMC, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVLDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = AVdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(AVdata.LDMC)
 # Extract the formula from the model
@@ -987,7 +988,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVLDMC: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVLDMC, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVLDMCmodel)
 plot(residuals)
 ```
@@ -1079,8 +1080,8 @@ plot_AV_variable(AVdata.LDMC, LDMC)
 #filtramos las filas con datos de nº de area.mes
 AVdata.area.m <- subset(AVdata, !is.na(area.m))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVarea.mmodel <- lm(sqrt(area.m) ~ trat + clip + trat:clip, data = AVdata.area.m, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = AVdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(AVdata.area.m)
 # Extract the formula from the model
@@ -1092,7 +1093,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVarea.m: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVarea.m, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVarea.mmodel)
 plot(residuals)
 ```
@@ -1184,8 +1185,8 @@ plot_AV_variable(AVdata, area.m)
 #filtramos las filas con datos de nº de Photosynes
 AVdata.Photosyn <- subset(AVdata, !is.na(Photosyn))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVPhotosynmodel <- lm(sqrt(Photosyn) ~ trat + clip + trat:clip, data = AVdata.Photosyn, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVPhotosynmodel <- lm((Photosyn) ~ trat + clip + trat:clip, data = AVdata.Photosyn, na.action = na.fail)
 
 sample_size <- nrow(AVdata.Photosyn)
 # Extract the formula from the model
@@ -1197,7 +1198,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVPhotosyn: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVPhotosyn, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVPhotosynmodel)
 plot(residuals)
 ```
@@ -1290,8 +1291,8 @@ plot_AV_variable(AVdata, Photosyn)
 #filtramos las filas con datos de nº de Conductancees
 AVdata.Conductance <- subset(AVdata, !is.na(Conductance))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVConductancemodel <- lm(sqrt(Conductance) ~ trat + clip + trat:clip, data = AVdata.Conductance, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVConductancemodel <- lm((Conductance) ~ trat + clip + trat:clip, data = AVdata.Conductance, na.action = na.fail)
 
 sample_size <- nrow(AVdata.Conductance)
 # Extract the formula from the model
@@ -1303,7 +1304,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVConductance: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVConductance, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVConductancemodel)
 plot(residuals)
 ```
@@ -1396,8 +1397,8 @@ plot_AV_variable(AVdata, Conductance)
 #filtramos las filas con datos de nº de PhiPS2es
 AVdata.PhiPS2 <- subset(AVdata, !is.na(PhiPS2))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVPhiPS2model <- lm(sqrt(PhiPS2) ~ trat + clip + trat:clip, data = AVdata.PhiPS2, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVPhiPS2model <- lm((PhiPS2) ~ trat + clip + trat:clip, data = AVdata.PhiPS2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.PhiPS2)
 # Extract the formula from the model
@@ -1409,7 +1410,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVPhiPS2: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVPhiPS2, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVPhiPS2model)
 plot(residuals)
 ```
@@ -1502,8 +1503,8 @@ plot_AV_variable(AVdata, PhiPS2)
 #filtramos las filas con datos de nº de dias_flores
 AVdata.dias_flor <- subset(AVdata, !is.na(dias_flor))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVdias_flormodel <- lm(sqrt(dias_flor) ~ trat + clip + trat:clip, data = AVdata.dias_flor, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = AVdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_flor)
 sample_size
@@ -1516,7 +1517,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVdias_flor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVdias_flor, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVdias_flormodel)
 plot(residuals)
 ```
@@ -1530,7 +1531,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVdias_flor MODEL, include=FALSE}
-anova_dias_flor <- Anova(AVdias_flormodel, type = 2, test.statistic = "F")
+anova_dias_flor <- Anova(AVdias_flormodel, type = 2)
 anova_dias_flor
 ```
 
@@ -1570,10 +1571,10 @@ anova_dias_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1609,8 +1610,8 @@ plot_AV_variable(AVdata, dias_flor)
 #filtramos las filas con datos de nº de dias_frutoes
 AVdata.dias_fruto <- subset(AVdata, !is.na(dias_fruto))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVdias_frutomodel <- lm(sqrt(dias_fruto) ~ trat + clip + trat:clip, data = AVdata.dias_fruto, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = AVdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_fruto)
 sample_size
@@ -1623,7 +1624,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVdias_fruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVdias_fruto, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVdias_frutomodel)
 plot(residuals)
 ```
@@ -1637,7 +1638,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVdias_fruto MODEL, include=FALSE}
-anova_dias_fruto <- Anova(AVdias_frutomodel, type = 2, test.statistic = "F")
+anova_dias_fruto <- Anova(AVdias_frutomodel, type = 2)
 anova_dias_fruto
 ```
 
@@ -1677,10 +1678,10 @@ anova_dias_fruto %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1719,9 +1720,8 @@ AVdata$periodo_flor <- AVdata$dias_fin_flor - AVdata$dias_flor
 #filtramos las filas con datos de nº de periodo_flores
 AVdata.periodo_flor <- subset(AVdata, !is.na(periodo_flor))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVperiodo_flormodel <- lm(sqrt(periodo_flor) ~ trat + clip + trat:clip, data = AVdata.periodo_flor, na.action = na.fail)#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVperiodo_flormodel <- lm(sqrt(periodo_flor) ~ trat + clip + trat:clip, data = AVdata.periodo_flor, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = AVdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.periodo_flor)
 sample_size
@@ -1734,7 +1734,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVperiodo_flor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVperiodo_flor, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVperiodo_flormodel)
 plot(residuals)
 ```
@@ -1748,7 +1748,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVperiodo_flor MODEL, include=FALSE}
-anova_periodo_flor <- Anova(AVperiodo_flormodel, type = 2, test.statistic = "F")
+anova_periodo_flor <- Anova(AVperiodo_flormodel, type = 2)
 anova_periodo_flor
 ```
 
@@ -1788,10 +1788,10 @@ anova_periodo_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1830,9 +1830,9 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 
  AVdata.periodo_fruto <- subset(AVdata, !is.na(periodo_fruto)) 
 
- #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
+ #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos 
 
- AVperiodo_frutomodel <- lm(sqrt(periodo_fruto) ~ trat + clip + trat:clip, data = AVdata.periodo_fruto, na.action = na.fail) 
+ AVperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = AVdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(AVdata.periodo_fruto) 
 
@@ -1852,7 +1852,7 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
  n = **`r sample_size`** 
 
 
-```{r DHARMA AVperiodo_fruto: checking residuals, echo=FALSE, fig.show='hide'} 
+```{r DHARMA AVperiodo_fruto, echo=FALSE, results='hold', warning=FALSE, message=FALSE} 
 
  residuals <- simulateResiduals(fittedModel = AVperiodo_frutomodel) 
 
@@ -1874,7 +1874,7 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 
 ```{r ANOVA OF AVperiodo_fruto MODEL, include=FALSE} 
 
- anova_periodo_fruto <- Anova(AVperiodo_frutomodel, type = 2, test.statistic = "F") 
+ anova_periodo_fruto <- Anova(AVperiodo_frutomodel, type = 2) 
 
  anova_periodo_fruto 
 
@@ -1933,13 +1933,13 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 
      Significance = case_when( 
 
-       `Pr(>F)` < 0.001 ~ "***", 
+       `Pr(>Chisq)` < 0.001 ~ "***", 
 
-       `Pr(>F)` < 0.01 ~ "**", 
+       `Pr(>Chisq)` < 0.01 ~ "**", 
 
-       `Pr(>F)` < 0.05 ~ "*", 
+       `Pr(>Chisq)` < 0.05 ~ "*", 
 
-       `Pr(>F)` < 0.1 ~ "·", 
+       `Pr(>Chisq)` < 0.1 ~ "·", 
 
        TRUE ~ ""  # No asterisk for p > 0.05 
 
@@ -1996,8 +1996,8 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 #filtramos las filas con datos de nº de dias_muertees
 AVdata.dias_muerte <- subset(AVdata, !is.na(dias_muerte))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVdias_muertemodel <- lm(sqrt(dias_muerte) ~ trat + clip + trat:clip, data = AVdata.dias_muerte, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = AVdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_muerte)
 # Extract the formula from the model
@@ -2009,7 +2009,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVdias_muerte: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVdias_muerte, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVdias_muertemodel)
 plot(residuals)
 ```
@@ -2023,7 +2023,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF AVdias_muerte MODEL, include=FALSE}
-anova_dias_muerte <- Anova(AVdias_muertemodel, type = 2, test.statistic = "F")
+anova_dias_muerte <- Anova(AVdias_muertemodel, type = 2)
 anova_dias_muerte
 ```
 
@@ -2063,10 +2063,10 @@ anova_dias_muerte %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -2102,8 +2102,8 @@ plot_AV_variable(AVdata, dias_muerte)
 #filtramos las filas con datos de nº de fenoleses
 AVdata.fenoles <- subset(AVdata, !is.na(fenoles))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVfenolesmodel <- lm(sqrt(fenoles) ~ trat + clip + trat:clip, data = AVdata.fenoles, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = AVdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(AVdata.fenoles)
 # Extract the formula from the model
@@ -2115,7 +2115,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVfenoles: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVfenoles, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVfenolesmodel)
 plot(residuals)
 ```
@@ -2207,8 +2207,8 @@ plot_AV_variable(AVdata, fenoles)
 #filtramos las filas con datos de nº de biomasses
 AVdata.biomass <- subset(AVdata, !is.na(biomass))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVbiomassmodel <- lm(sqrt(biomass) ~ trat + clip + trat:clip, data = AVdata.biomass, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = AVdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(AVdata.biomass)
 # Extract the formula from the model
@@ -2220,7 +2220,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVbiomass: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVbiomass, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVbiomassmodel)
 plot(residuals)
 ```
@@ -2314,8 +2314,8 @@ plot_AV_variable(AVdata, biomass)
 #filtramos las filas con datos de nº de AvgDiam.mm.es
 AVdata.AvgDiam.mm. <- subset(AVdata, !is.na(AvgDiam.mm.))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVAvgDiam.mm.model <- lm(sqrt(AvgDiam.mm.) ~ trat + clip + trat:clip, data = AVdata.AvgDiam.mm., na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = AVdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(AVdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2327,7 +2327,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVAvgDiam.mm.: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVAvgDiam.mm., echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVAvgDiam.mm.model)
 plot(residuals)
 ```
@@ -2421,8 +2421,8 @@ plot_AV_variable(AVdata, AvgDiam.mm.)
 #filtramos las filas con datos de nº de RTDes
 AVdata.RTD <- subset(AVdata, !is.na(RTD))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVRTDmodel <- lm(sqrt(RTD) ~ trat + clip + trat:clip, data = AVdata.RTD, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVRTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = AVdata.RTD, na.action = na.fail)
 
 sample_size <- nrow(AVdata.RTD)
 # Extract the formula from the model
@@ -2434,7 +2434,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVRTD: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVRTD, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVRTDmodel)
 plot(residuals)
 ```
@@ -2528,8 +2528,8 @@ plot_AV_variable(AVdata, RTD)
 #filtramos las filas con datos de nº de SRLes
 AVdata.SRL <- subset(AVdata, !is.na(SRL))
 
-#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-AVSRLmodel <- lm(sqrt(SRL) ~ trat + clip + trat:clip, data = AVdata.SRL, na.action = na.fail)
+#probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
+AVSRLmodel <- lm((SRL) ~ trat + clip + trat:clip, data = AVdata.SRL, na.action = na.fail)
 
 sample_size <- nrow(AVdata.SRL)
 # Extract the formula from the model
@@ -2541,7 +2541,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA AVSRL: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA AVSRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = AVSRLmodel)
 plot(residuals)
 ```

@@ -20,8 +20,10 @@ library(knitr)
 library(emmeans)
 library(car)
 library(scales)
+library(here)
+library(glmmTMB)
 
-data <- read.table("rawdata/datos_sibecol_2025.csv", header = TRUE, sep = ";")
+data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
 ```
 
@@ -116,7 +118,7 @@ plot_CA_variable <- function(data, response_var) {
 CAdata.flor <- subset(CAdata, !is.na(flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAflormodel <- lm(sqrt(flor) ~ trat + clip + trat:clip, data = CAdata.flor, na.action = na.fail)
+CAflormodel <- glmmTMB((flor) ~ trat + clip + trat:clip, data = CAdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.flor)
 # Extract the formula from the model
@@ -128,7 +130,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAflor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAflor: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAflormodel)
 plot(residuals)
 ```
@@ -142,7 +144,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAflor MODEL, include=FALSE}
-anova_flor <- Anova(CAflormodel, type = 2, test.statistic = "F")
+anova_flor <- Anova(CAflormodel, type = 2)
 anova_flor
 ```
 
@@ -182,10 +184,10 @@ anova_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -222,7 +224,7 @@ plot_CA_variable(CAdata, flor)
 CAdata.fruto <- subset(CAdata, !is.na(fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAfrutomodel <- lm(sqrt(fruto) ~ trat + clip + trat:clip, data = CAdata.fruto, na.action = na.fail)
+CAfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = CAdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.fruto)
 # Extract the formula from the model
@@ -234,7 +236,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAfruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAfruto: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAfrutomodel)
 plot(residuals)
 ```
@@ -248,7 +250,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAfruto MODEL, include=FALSE}
-anova_fruto <- Anova(CAfrutomodel, type = 2, test.statistic = "F")
+anova_fruto <- Anova(CAfrutomodel, type = 2)
 anova_fruto
 ```
 
@@ -288,10 +290,10 @@ anova_fruto %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -328,7 +330,7 @@ plot_CA_variable(CAdata, fruto)
 CAdata.hojas <- subset(CAdata, !is.na(hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAhojasmodel <- lm(log(hojas) ~ trat + clip + trat:clip, data = CAdata.hojas, na.action = na.fail)
+CAhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = CAdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.hojas)
 # Extract the formula from the model
@@ -340,7 +342,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAhojas: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAhojas: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAhojasmodel)
 plot(residuals)
 ```
@@ -354,7 +356,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAhojas MODEL, include=FALSE}
-anova_hojas <- Anova(CAhojasmodel, type = 2, test.statistic = "F")
+anova_hojas <- Anova(CAhojasmodel, type = 2)
 anova_hojas
 ```
 
@@ -394,10 +396,10 @@ anova_hojas %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -433,7 +435,7 @@ plot_CA_variable(CAdata, hojas)
 CAdata.altura <- subset(CAdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAalturamodel <- lm(sqrt(altura) ~ trat + clip + trat:clip, data = CAdata.altura, na.action = na.fail)
+CAalturamodel <- lm((altura) ~ trat + clip + trat:clip, data = CAdata.altura, na.action = na.fail)
 
 sample_size <- nrow(CAdata.altura)
 # Extract the formula from the model
@@ -445,7 +447,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAaltura: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAaltura: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAalturamodel)
 plot(residuals)
 ```
@@ -541,7 +543,7 @@ CAdata.seedfruto <- subset(CAdata, !is.na(seedfruto))
 CAdata.seedfruto$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAseedfrutomodel <- lm(sqrt(seedfruto) ~ trat + clip + trat:clip, data = CAdata.seedfruto, na.action = na.fail)
+CAseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = CAdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.seedfruto)
 # Extract the formula from the model
@@ -553,7 +555,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAseedfruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAseedfruto: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAseedfrutomodel)
 plot(residuals)
 ```
@@ -567,7 +569,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAseedfruto MODEL, include=FALSE}
-anova_seedfruto <- Anova(CAseedfrutomodel, type = 2, test.statistic = "F")
+anova_seedfruto <- Anova(CAseedfrutomodel, type = 2)
 anova_seedfruto
 ```
 
@@ -607,10 +609,10 @@ anova_seedfruto %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -647,7 +649,7 @@ plot_CA_variable(CAdata, seedfruto)
 CAdata.seedtotal <- subset(CAdata, !is.na(seedtotal))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAseedtotalmodel <- lm(sqrt(seedtotal) ~ trat + clip + trat:clip, data = CAdata.seedtotal, na.action = na.fail)
+CAseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = CAdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.seedtotal)
 # Extract the formula from the model
@@ -659,7 +661,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAseedtotal: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAseedtotal: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAseedtotalmodel)
 plot(residuals)
 ```
@@ -673,7 +675,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAseedtotal MODEL, include=FALSE}
-anova_seedtotal <- Anova(CAseedtotalmodel, type = 2, test.statistic = "F")
+anova_seedtotal <- Anova(CAseedtotalmodel, type = 2)
 anova_seedtotal
 ```
 
@@ -713,10 +715,10 @@ anova_seedtotal %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -753,7 +755,7 @@ plot_CA_variable(CAdata, seedtotal)
 CAdata.massseed <- subset(CAdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAmassseedmodel <- lm(sqrt(massseed) ~ trat + clip + trat:clip, data = CAdata.massseed, na.action = na.fail)
+CAmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = CAdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(CAdata.massseed)
 # Extract the formula from the model
@@ -765,7 +767,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAmassseed: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAmassseed: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAmassseedmodel)
 plot(residuals)
 ```
@@ -865,7 +867,7 @@ CAdata.SLA <- subset(CAdata, !is.na(SLA))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CASLAmodel <- lm(sqrt(SLA) ~ trat + clip + trat:clip, data = CAdata.SLA, na.action = na.fail)
+CASLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = CAdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(CAdata.SLA)
 # Extract the formula from the model
@@ -877,7 +879,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`** 
 
-```{r DHARMA CASLA: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CASLA: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CASLAmodel)
 plot(residuals)
 ```
@@ -973,7 +975,7 @@ CAdata.LDMC <- subset(CAdata, !is.na(LDMC))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CALDMCmodel <- lm(sqrt(LDMC) ~ trat + clip + trat:clip, data = CAdata.LDMC, na.action = na.fail)
+CALDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = CAdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(CAdata.LDMC)
 # Extract the formula from the model
@@ -985,7 +987,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CALDMC: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CALDMC: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CALDMCmodel)
 plot(residuals)
 ```
@@ -1078,7 +1080,7 @@ plot_CA_variable(CAdata, LDMC)
 CAdata.area.m <- subset(CAdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAarea.mmodel <- lm(sqrt(area.m) ~ trat + clip + trat:clip, data = CAdata.area.m, na.action = na.fail)
+CAarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = CAdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(CAdata.area.m)
 # Extract the formula from the model
@@ -1090,7 +1092,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAarea.m: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAarea.m: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAarea.mmodel)
 plot(residuals)
 ```
@@ -1184,7 +1186,7 @@ plot_CA_variable(CAdata, area.m)
 CAdata.dias_flor <- subset(CAdata, !is.na(dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_flormodel <- lm(sqrt(dias_flor) ~ trat + clip + trat:clip, data = CAdata.dias_flor, na.action = na.fail)
+CAdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = CAdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_flor)
 sample_size
@@ -1197,7 +1199,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAdias_flor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAdias_flor: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAdias_flormodel)
 plot(residuals)
 ```
@@ -1211,7 +1213,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAdias_flor MODEL, include=FALSE}
-anova_dias_flor <- Anova(CAdias_flormodel, type = 2, test.statistic = "F")
+anova_dias_flor <- Anova(CAdias_flormodel, type = 2)
 anova_dias_flor
 ```
 
@@ -1251,10 +1253,10 @@ anova_dias_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1291,7 +1293,7 @@ plot_CA_variable(CAdata, dias_flor)
 CAdata.dias_fruto <- subset(CAdata, !is.na(dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_frutomodel <- lm(sqrt(dias_fruto) ~ trat + clip + trat:clip, data = CAdata.dias_fruto, na.action = na.fail)
+CAdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = CAdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_fruto)
 sample_size
@@ -1304,7 +1306,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAdias_fruto: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAdias_fruto: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAdias_frutomodel)
 plot(residuals)
 ```
@@ -1318,7 +1320,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAdias_fruto MODEL, include=FALSE}
-anova_dias_fruto <- Anova(CAdias_frutomodel, type = 2, test.statistic = "F")
+anova_dias_fruto <- Anova(CAdias_frutomodel, type = 2)
 anova_dias_fruto
 ```
 
@@ -1358,10 +1360,10 @@ anova_dias_fruto %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1401,8 +1403,7 @@ CAdata$periodo_flor <- CAdata$dias_fin_flor - CAdata$dias_flor
 CAdata.periodo_flor <- subset(CAdata, !is.na(periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAperiodo_flormodel <- lm(sqrt(periodo_flor) ~ trat + clip + trat:clip, data = CAdata.periodo_flor, na.action = na.fail)#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAperiodo_flormodel <- lm(sqrt(periodo_flor) ~ trat + clip + trat:clip, data = CAdata.periodo_flor, na.action = na.fail)
+CAperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = CAdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.periodo_flor)
 sample_size
@@ -1415,7 +1416,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAperiodo_flor: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAperiodo_flor: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAperiodo_flormodel)
 plot(residuals)
 ```
@@ -1429,7 +1430,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAperiodo_flor MODEL, include=FALSE}
-anova_periodo_flor <- Anova(CAperiodo_flormodel, type = 2, test.statistic = "F")
+anova_periodo_flor <- Anova(CAperiodo_flormodel, type = 2)
 anova_periodo_flor
 ```
 
@@ -1469,10 +1470,10 @@ anova_periodo_flor %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1513,7 +1514,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
 
- CAperiodo_frutomodel <- lm(sqrt(periodo_fruto) ~ trat + clip + trat:clip, data = CAdata.periodo_fruto, na.action = na.fail) 
+ CAperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = CAdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(CAdata.periodo_fruto) 
 
@@ -1533,7 +1534,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
  n = **`r sample_size`** 
 
 
-```{r DHARMA CAperiodo_fruto: checking residuals, echo=FALSE, fig.show='hide'} 
+```{r DHARMA CAperiodo_fruto: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE} 
 
  residuals <- simulateResiduals(fittedModel = CAperiodo_frutomodel) 
 
@@ -1555,7 +1556,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 
 ```{r ANOVA OF CAperiodo_fruto MODEL, include=FALSE} 
 
- anova_periodo_fruto <- Anova(CAperiodo_frutomodel, type = 2, test.statistic = "F") 
+ anova_periodo_fruto <- Anova(CAperiodo_frutomodel, type = 2) 
 
  anova_periodo_fruto 
 
@@ -1614,13 +1615,13 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 
      Significance = case_when( 
 
-       `Pr(>F)` < 0.001 ~ "***", 
+       `Pr(>Chisq)` < 0.001 ~ "***", 
 
-       `Pr(>F)` < 0.01 ~ "**", 
+       `Pr(>Chisq)` < 0.01 ~ "**", 
 
-       `Pr(>F)` < 0.05 ~ "*", 
+       `Pr(>Chisq)` < 0.05 ~ "*", 
 
-       `Pr(>F)` < 0.1 ~ "·", 
+       `Pr(>Chisq)` < 0.1 ~ "·", 
 
        TRUE ~ ""  # No asterisk for p > 0.05 
 
@@ -1678,7 +1679,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 CAdata.dias_muerte <- subset(CAdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_muertemodel <- lm(sqrt(dias_muerte) ~ trat + clip + trat:clip, data = CAdata.dias_muerte, na.action = na.fail)
+CAdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = CAdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_muerte)
 # Extract the formula from the model
@@ -1690,7 +1691,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAdias_muerte: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAdias_muerte: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAdias_muertemodel)
 plot(residuals)
 ```
@@ -1704,7 +1705,7 @@ rsq
 R² = **`r rsq`**
 
 ```{r ANOVA OF CAdias_muerte MODEL, include=FALSE}
-anova_dias_muerte <- Anova(CAdias_muertemodel, type = 2, test.statistic = "F")
+anova_dias_muerte <- Anova(CAdias_muertemodel, type = 2)
 anova_dias_muerte
 ```
 
@@ -1744,10 +1745,10 @@ anova_dias_muerte %>%
   rownames_to_column("Predictor") %>%
   mutate(
     Significance = case_when(
-      `Pr(>F)` < 0.001 ~ "***",
-      `Pr(>F)` < 0.01 ~ "**",
-      `Pr(>F)` < 0.05 ~ "*",
-      `Pr(>F)` < 0.1 ~ "·",
+      `Pr(>Chisq)` < 0.001 ~ "***",
+      `Pr(>Chisq)` < 0.01 ~ "**",
+      `Pr(>Chisq)` < 0.05 ~ "*",
+      `Pr(>Chisq)` < 0.1 ~ "·",
       TRUE ~ ""  # No asterisk for p > 0.05
     ),
     Predictor_with_significance = paste(Predictor, Significance, sep = " ")
@@ -1784,7 +1785,7 @@ plot_CA_variable(CAdata, dias_muerte)
 CAdata.fenoles <- subset(CAdata, !is.na(fenoles))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAfenolesmodel <- lm(sqrt(fenoles) ~ trat + clip + trat:clip, data = CAdata.fenoles, na.action = na.fail)
+CAfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = CAdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(CAdata.fenoles)
 # Extract the formula from the model
@@ -1796,7 +1797,7 @@ model_formula_clean <- deparse(model_formula)
 **`r model_formula_clean`**\
 n = **`r sample_size`**
 
-```{r DHARMA CAfenoles: checking residuals, echo=FALSE, fig.show='hide'}
+```{r DHARMA CAfenoles: checking residuals, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 residuals <- simulateResiduals(fittedModel = CAfenolesmodel)
 plot(residuals)
 ```
@@ -1880,4 +1881,431 @@ anova_fenoles %>%
 
 ```{r PLOTTING CA fenoles, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 plot_CA_variable(CAdata, fenoles)
+```
+
+### A.barbata - BIOMASA
+
+```{r CAbiomass Model, include=FALSE}
+#filtramos las filas con datos de nº de biomasses
+CAdata.biomass <- subset(CAdata, !is.na(biomass))
+
+#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
+CAbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = CAdata.biomass, na.action = na.fail)
+
+sample_size <- nrow(CAdata.biomass)
+# Extract the formula from the model
+model_formula <- formula(CAbiomassmodel)
+# Convert formula to character and clean up
+model_formula_clean <- deparse(model_formula)
+```
+
+**`r model_formula_clean`**\
+n = **`r sample_size`**
+
+```{r DHARMA CAbiomass, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+residuals <- simulateResiduals(fittedModel = CAbiomassmodel)
+plot(residuals)
+```
+
+```{r SUMMARY OF CAbiomass MODEL, include=FALSE}
+summary <- summary(CAbiomassmodel)
+rsq <- summary$adj.r.squared
+rsq
+```
+
+R² = **`r rsq`**
+
+```{r ANOVA OF CAbiomass MODEL, include=FALSE}
+anova_biomass <- Anova(CAbiomassmodel, type = 2, test.statistic = "F")
+anova_biomass
+```
+
+```{r CAbiomass Post-hoc Comparisons with Tukeys HSD, echo=FALSE, include=FALSE}
+# This will compare treatment levels within each level of grazer
+posthoc_trat <- emmeans(CAbiomassmodel, pairwise ~ trat | clip, adjust = "tukey")
+print(posthoc_trat)
+
+# This will compare grazer levels within each treatment
+posthoc_clip <- emmeans(CAbiomassmodel, pairwise ~ clip | trat, adjust = "tukey")
+print(posthoc_clip)
+
+# Visualizing results
+
+# Plot treatment differences within each grazer
+plot(posthoc_trat$emmeans)  
+
+# Plot grazer differences within each treatment
+plot(posthoc_clip$emmeans)
+
+```
+
+##### [CAbiomass Post-hoc Comparisons with Tukeys HSD]{.underline}
+
+```{r Post-hoc CAbiomass, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+kable(as.data.frame(posthoc_clip$contrasts))
+
+kable(as.data.frame(posthoc_trat$contrasts))
+
+```
+
+```{r ANOVA CAbiomass, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+# Convert the ANOVA results to a data frame and create a styled table
+
+anova_biomass %>%
+  as.data.frame() %>%
+  rownames_to_column("Predictor") %>%
+  mutate(
+    Significance = case_when(
+      `Pr(>F)` < 0.001 ~ "***",
+      `Pr(>F)` < 0.01 ~ "**",
+      `Pr(>F)` < 0.05 ~ "*",
+      `Pr(>F)` < 0.1 ~ "·",
+      TRUE ~ ""  # No asterisk for p > 0.05
+    ),
+    Predictor_with_significance = paste(Predictor, Significance, sep = " ")
+  ) %>%
+  select(-Predictor, -Significance) %>%  # Removes Df.res and Significance columns
+  rename(Predictor = Predictor_with_significance) %>%  # Renames column
+  mutate(
+    # Round all numeric columns to 3 decimal points
+    across(where(is.numeric), ~ round(., 3)),
+    # Add the new column 'Response' with "Diversity" in all rows
+    Response = "CA biomass"
+  ) %>%
+  select(Response, Predictor, everything()) %>%  # Moves Response to the first column
+  kable("html", caption = "ANOVA Results for CAbiomass Model") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"), 
+    full_width = FALSE
+  ) %>%
+  column_spec(1, background = "lightgray", bold = TRUE, width = "5em") %>%  # Style Response
+  column_spec(2, width = "10em")  # Adjust width of Predictor column
+
+
+```
+
+```{r PLOTTING CA biomass, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+plot_CA_variable(CAdata, biomass)
+
+```
+
+
+### A.barbata - Diámetro de la raíz
+
+```{r CAAvgDiam.mm. Model, include=FALSE}
+#filtramos las filas con datos de nº de AvgDiam.mm.es
+CAdata.AvgDiam.mm. <- subset(CAdata, !is.na(AvgDiam.mm.))
+
+#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
+CAAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = CAdata.AvgDiam.mm., na.action = na.fail)
+
+sample_size <- nrow(CAdata.AvgDiam.mm.)
+# Extract the formula from the model
+model_formula <- formula(CAAvgDiam.mm.model)
+# Convert formula to character and clean up
+model_formula_clean <- deparse(model_formula)
+```
+
+**`r model_formula_clean`**\
+n = **`r sample_size`**
+
+```{r DHARMA CAAvgDiam.mm., echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+residuals <- simulateResiduals(fittedModel = CAAvgDiam.mm.model)
+plot(residuals)
+```
+
+```{r SUMMARY OF CAAvgDiam.mm. MODEL, include=FALSE}
+summary <- summary(CAAvgDiam.mm.model)
+rsq <- summary$adj.r.squared
+rsq
+```
+
+R² = **`r rsq`**
+
+```{r ANOVA OF CAAvgDiam.mm. MODEL, include=FALSE}
+anova_AvgDiam.mm. <- Anova(CAAvgDiam.mm.model, type = 2, test.statistic = "F")
+anova_AvgDiam.mm.
+```
+
+```{r CAAvgDiam.mm. Post-hoc Comparisons with Tukeys HSD, echo=FALSE, include=FALSE}
+# This will compare treatment levels within each level of grazer
+posthoc_trat <- emmeans(CAAvgDiam.mm.model, pairwise ~ trat | clip, adjust = "tukey")
+print(posthoc_trat)
+
+# This will compare grazer levels within each treatment
+posthoc_clip <- emmeans(CAAvgDiam.mm.model, pairwise ~ clip | trat, adjust = "tukey")
+print(posthoc_clip)
+
+# Visualizing results
+
+# Plot treatment differences within each grazer
+plot(posthoc_trat$emmeans)  
+
+# Plot grazer differences within each treatment
+plot(posthoc_clip$emmeans)
+
+```
+
+##### [CAAvgDiam.mm. Post-hoc Comparisons with Tukeys HSD]{.underline}
+
+```{r Post-hoc CAAvgDiam.mm., echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+kable(as.data.frame(posthoc_clip$contrasts))
+
+kable(as.data.frame(posthoc_trat$contrasts))
+
+```
+
+```{r ANOVA CAAvgDiam.mm., echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+# Convert the ANOVA results to a data frame and create a styled table
+
+anova_AvgDiam.mm. %>%
+  as.data.frame() %>%
+  rownames_to_column("Predictor") %>%
+  mutate(
+    Significance = case_when(
+      `Pr(>F)` < 0.001 ~ "***",
+      `Pr(>F)` < 0.01 ~ "**",
+      `Pr(>F)` < 0.05 ~ "*",
+      `Pr(>F)` < 0.1 ~ "·",
+      TRUE ~ ""  # No asterisk for p > 0.05
+    ),
+    Predictor_with_significance = paste(Predictor, Significance, sep = " ")
+  ) %>%
+  select(-Predictor, -Significance) %>%  # Removes Df.res and Significance columns
+  rename(Predictor = Predictor_with_significance) %>%  # Renames column
+  mutate(
+    # Round all numeric columns to 3 decimal points
+    across(where(is.numeric), ~ round(., 3)),
+    # Add the new column 'Response' with "Diversity" in all rows
+    Response = "CA AvgDiam.mm."
+  ) %>%
+  select(Response, Predictor, everything()) %>%  # Moves Response to the first column
+  kable("html", caption = "ANOVA Results for CAAvgDiam.mm. Model") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"), 
+    full_width = FALSE
+  ) %>%
+  column_spec(1, background = "lightgray", bold = TRUE, width = "5em") %>%  # Style Response
+  column_spec(2, width = "10em")  # Adjust width of Predictor column
+
+
+```
+
+```{r PLOTTING CA AvgDiam.mm., echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+plot_CA_variable(CAdata, AvgDiam.mm.)
+
+```
+
+
+### A.barbata - Root Tissue Density (RTD)
+
+```{r CARTD Model, include=FALSE}
+#filtramos las filas con datos de nº de RTDes
+CAdata.RTD <- subset(CAdata, !is.na(RTD))
+
+#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
+CARTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = CAdata.RTD, na.action = na.fail)
+
+sample_size <- nrow(CAdata.RTD)
+# Extract the formula from the model
+model_formula <- formula(CARTDmodel)
+# Convert formula to character and clean up
+model_formula_clean <- deparse(model_formula)
+```
+
+**`r model_formula_clean`**\
+n = **`r sample_size`**
+
+```{r DHARMA CARTD, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+residuals <- simulateResiduals(fittedModel = CARTDmodel)
+plot(residuals)
+```
+
+```{r SUMMARY OF CARTD MODEL, include=FALSE}
+summary <- summary(CARTDmodel)
+rsq <- summary$adj.r.squared
+rsq
+```
+
+R² = **`r rsq`**
+
+```{r ANOVA OF CARTD MODEL, include=FALSE}
+anova_RTD <- Anova(CARTDmodel, type = 2, test.statistic = "F")
+anova_RTD
+```
+
+```{r CARTD Post-hoc Comparisons with Tukeys HSD, echo=FALSE, include=FALSE}
+# This will compare treatment levels within each level of grazer
+posthoc_trat <- emmeans(CARTDmodel, pairwise ~ trat | clip, adjust = "tukey")
+print(posthoc_trat)
+
+# This will compare grazer levels within each treatment
+posthoc_clip <- emmeans(CARTDmodel, pairwise ~ clip | trat, adjust = "tukey")
+print(posthoc_clip)
+
+# Visualizing results
+
+# Plot treatment differences within each grazer
+plot(posthoc_trat$emmeans)  
+
+# Plot grazer differences within each treatment
+plot(posthoc_clip$emmeans)
+
+```
+
+##### [CARTD Post-hoc Comparisons with Tukeys HSD]{.underline}
+
+```{r Post-hoc CARTD, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+kable(as.data.frame(posthoc_clip$contrasts))
+
+kable(as.data.frame(posthoc_trat$contrasts))
+
+```
+
+```{r ANOVA CARTD, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+# Convert the ANOVA results to a data frame and create a styled table
+
+anova_RTD %>%
+  as.data.frame() %>%
+  rownames_to_column("Predictor") %>%
+  mutate(
+    Significance = case_when(
+      `Pr(>F)` < 0.001 ~ "***",
+      `Pr(>F)` < 0.01 ~ "**",
+      `Pr(>F)` < 0.05 ~ "*",
+      `Pr(>F)` < 0.1 ~ "·",
+      TRUE ~ ""  # No asterisk for p > 0.05
+    ),
+    Predictor_with_significance = paste(Predictor, Significance, sep = " ")
+  ) %>%
+  select(-Predictor, -Significance) %>%  # Removes Df.res and Significance columns
+  rename(Predictor = Predictor_with_significance) %>%  # Renames column
+  mutate(
+    # Round all numeric columns to 3 decimal points
+    across(where(is.numeric), ~ round(., 3)),
+    # Add the new column 'Response' with "Diversity" in all rows
+    Response = "CA RTD"
+  ) %>%
+  select(Response, Predictor, everything()) %>%  # Moves Response to the first column
+  kable("html", caption = "ANOVA Results for CARTD Model") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"), 
+    full_width = FALSE
+  ) %>%
+  column_spec(1, background = "lightgray", bold = TRUE, width = "5em") %>%  # Style Response
+  column_spec(2, width = "10em")  # Adjust width of Predictor column
+
+
+```
+
+```{r PLOTTING CA RTD, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+plot_CA_variable(CAdata, RTD)
+
+```
+
+
+### A.barbata - Specific Root Length (SRL)
+
+```{r CASRL Model, include=FALSE}
+#filtramos las filas con datos de nº de SRLes
+CAdata.SRL <- subset(CAdata, !is.na(SRL))
+
+#probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
+CASRLmodel <- lm((SRL) ~ trat + clip + trat:clip, data = CAdata.SRL, na.action = na.fail)
+
+sample_size <- nrow(CAdata.SRL)
+# Extract the formula from the model
+model_formula <- formula(CASRLmodel)
+# Convert formula to character and clean up
+model_formula_clean <- deparse(model_formula)
+```
+
+**`r model_formula_clean`**\
+n = **`r sample_size`**
+
+```{r DHARMA CASRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+residuals <- simulateResiduals(fittedModel = CASRLmodel)
+plot(residuals)
+```
+
+```{r SUMMARY OF CASRL MODEL, include=FALSE}
+summary <- summary(CASRLmodel)
+rsq <- summary$adj.r.squared
+rsq
+```
+
+R² = **`r rsq`**
+
+```{r ANOVA OF CASRL MODEL, include=FALSE}
+anova_SRL <- Anova(CASRLmodel, type = 2, test.statistic = "F")
+anova_SRL
+```
+
+```{r CASRL Post-hoc Comparisons with Tukeys HSD, echo=FALSE, include=FALSE}
+# This will compare treatment levels within each level of grazer
+posthoc_trat <- emmeans(CASRLmodel, pairwise ~ trat | clip, adjust = "tukey")
+print(posthoc_trat)
+
+# This will compare grazer levels within each treatment
+posthoc_clip <- emmeans(CASRLmodel, pairwise ~ clip | trat, adjust = "tukey")
+print(posthoc_clip)
+
+# Visualizing results
+
+# Plot treatment differences within each grazer
+plot(posthoc_trat$emmeans)  
+
+# Plot grazer differences within each treatment
+plot(posthoc_clip$emmeans)
+
+```
+
+##### [CASRL Post-hoc Comparisons with Tukeys HSD]{.underline}
+
+```{r Post-hoc CASRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+kable(as.data.frame(posthoc_clip$contrasts))
+
+kable(as.data.frame(posthoc_trat$contrasts))
+
+```
+
+```{r ANOVA CASRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+# Convert the ANOVA results to a data frame and create a styled table
+
+anova_SRL %>%
+  as.data.frame() %>%
+  rownames_to_column("Predictor") %>%
+  mutate(
+    Significance = case_when(
+      `Pr(>F)` < 0.001 ~ "***",
+      `Pr(>F)` < 0.01 ~ "**",
+      `Pr(>F)` < 0.05 ~ "*",
+      `Pr(>F)` < 0.1 ~ "·",
+      TRUE ~ ""  # No asterisk for p > 0.05
+    ),
+    Predictor_with_significance = paste(Predictor, Significance, sep = " ")
+  ) %>%
+  select(-Predictor, -Significance) %>%  # Removes Df.res and Significance columns
+  rename(Predictor = Predictor_with_significance) %>%  # Renames column
+  mutate(
+    # Round all numeric columns to 3 decimal points
+    across(where(is.numeric), ~ round(., 3)),
+    # Add the new column 'Response' with "Diversity" in all rows
+    Response = "CA SRL"
+  ) %>%
+  select(Response, Predictor, everything()) %>%  # Moves Response to the first column
+  kable("html", caption = "ANOVA Results for CASRL Model") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"), 
+    full_width = FALSE
+  ) %>%
+  column_spec(1, background = "lightgray", bold = TRUE, width = "5em") %>%  # Style Response
+  column_spec(2, width = "10em")  # Adjust width of Predictor column
+
+
+```
+
+```{r PLOTTING CA SRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
+plot_CA_variable(CAdata, SRL)
+
 ```
