@@ -22,6 +22,7 @@ library(car)
 library(scales)
 library(here)
 library(glmmTMB)
+library(purrr)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -120,7 +121,7 @@ HOdata.flor$flor
 HOdata.flor <- subset(HOdata.flor, flor != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOflormodel <- glmmTMB((flor) ~ trat + clip + trat:clip, data = HOdata.flor, family = nbinom2, na.action = na.fail)
+HOflormodel <- glmmTMB(flor ~ trat + clip + trat:clip, data = HOdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.flor)
 sample_size
@@ -230,7 +231,7 @@ HOdata.fruto$fruto
 HOdata.fruto <- subset(HOdata.fruto, fruto != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = HOdata.fruto, family = nbinom2, na.action = na.fail)
+HOfrutomodel <- glmmTMB(fruto ~ trat + clip + trat:clip, data = HOdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.fruto)
 sample_size
@@ -337,7 +338,7 @@ plot_HO_variable(HOdata.fruto, fruto)
 HOdata.hojas <- subset(HOdata, !is.na(hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = HOdata.hojas, family = nbinom2, na.action = na.fail)
+HOhojasmodel <- glmmTMB(hojas ~ trat + clip + trat:clip, data = HOdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.hojas)
 sample_size
@@ -443,7 +444,7 @@ plot_HO_variable(HOdata, hojas)
 HOdata.altura <- subset(HOdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOalturamodel <- lm((altura) ~ trat + clip + trat:clip, data = HOdata.altura, na.action = na.fail)
+HOalturamodel <- lm(altura ~ trat + clip + trat:clip, data = HOdata.altura, na.action = na.fail)
 
 sample_size <- nrow(HOdata.altura)
 sample_size
@@ -557,7 +558,7 @@ subset(HOdata.seedfruto, trat == "ex" & clip == "no")$seedfruto
 subset(HOdata.seedfruto, trat == "ex" & clip == "yes")$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = HOdata.seedfruto, family = nbinom2, na.action = na.fail)
+HOseedfrutomodel <- glmmTMB(seedfruto ~ trat + clip + trat:clip, data = HOdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.seedfruto)
 # Extract the formula from the model
@@ -666,7 +667,7 @@ hist(HOdata.seedtotal$seedtotal)
 HOdata.seedtotal <- subset(HOdata.seedtotal, seedtotal != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = HOdata.seedtotal, family = nbinom2, na.action = na.fail)
+HOseedtotalmodel <- glmmTMB(seedtotal ~ trat + clip + trat:clip, data = HOdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.seedtotal)
 sample_size
@@ -773,7 +774,7 @@ plot_HO_variable(HOdata.seedtotal, seedtotal)
 HOdata.massseed <- subset(HOdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = HOdata.massseed, na.action = na.fail)
+HOmassseedmodel <- lm(massseed ~ trat + clip + trat:clip, data = HOdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(HOdata.massseed)
 sample_size
@@ -879,7 +880,7 @@ plot_HO_variable(HOdata, massseed)
 HOdata.SLA <- subset(HOdata, !is.na(SLA))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOSLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = HOdata.SLA, na.action = na.fail)
+HOSLAmodel <- lm(SLA ~ trat + clip + trat:clip, data = HOdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(HOdata.SLA)
 # Extract the formula from the model
@@ -987,7 +988,7 @@ HOdata.LDMC <- subset(HOdata, !is.na(LDMC))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOLDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = HOdata.LDMC, na.action = na.fail)
+HOLDMCmodel <- lm(LDMC ~ trat + clip + trat:clip, data = HOdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(HOdata.LDMC)
 # Extract the formula from the model
@@ -1092,7 +1093,7 @@ plot_HO_variable(HOdata, LDMC)
 HOdata.area.m <- subset(HOdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = HOdata.area.m, na.action = na.fail)
+HOarea.mmodel <- lm(area.m ~ trat + clip + trat:clip, data = HOdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(HOdata.area.m)
 # Extract the formula from the model
@@ -1197,7 +1198,7 @@ plot_HO_variable(HOdata, area.m)
 HOdata.Photosyn <- subset(HOdata, !is.na(Photosyn))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOPhotosynmodel <- lm((Photosyn) ~ trat + clip + trat:clip, data = HOdata.Photosyn, na.action = na.fail)
+HOPhotosynmodel <- lm(Photosyn ~ trat + clip + trat:clip, data = HOdata.Photosyn, na.action = na.fail)
 
 sample_size <- nrow(HOdata.Photosyn)
 # Extract the formula from the model
@@ -1303,7 +1304,7 @@ plot_HO_variable(HOdata, Photosyn)
 HOdata.Conductance <- subset(HOdata, !is.na(Conductance))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOConductancemodel <- lm((Conductance) ~ trat + clip + trat:clip, data = HOdata.Conductance, na.action = na.fail)
+HOConductancemodel <- lm(Conductance ~ trat + clip + trat:clip, data = HOdata.Conductance, na.action = na.fail)
 
 sample_size <- nrow(HOdata.Conductance)
 # Extract the formula from the model
@@ -1409,7 +1410,7 @@ plot_HO_variable(HOdata, Conductance)
 HOdata.PhiPS2 <- subset(HOdata, !is.na(PhiPS2))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOPhiPS2model <- lm((PhiPS2) ~ trat + clip + trat:clip, data = HOdata.PhiPS2, na.action = na.fail)
+HOPhiPS2model <- lm(PhiPS2 ~ trat + clip + trat:clip, data = HOdata.PhiPS2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.PhiPS2)
 # Extract the formula from the model
@@ -1515,7 +1516,7 @@ plot_HO_variable(HOdata, PhiPS2)
 HOdata.dias_flor <- subset(HOdata, !is.na(dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = HOdata.dias_flor, family = nbinom2, na.action = na.fail)
+HOdias_flormodel <- glmmTMB(dias_flor ~ trat + clip + trat:clip, data = HOdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.dias_flor)
 sample_size
@@ -1622,7 +1623,7 @@ plot_HO_variable(HOdata, dias_flor)
 HOdata.dias_fruto <- subset(HOdata, !is.na(dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = HOdata.dias_fruto, family = nbinom2, na.action = na.fail)
+HOdias_frutomodel <- glmmTMB(dias_fruto ~ trat + clip + trat:clip, data = HOdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.dias_fruto)
 sample_size
@@ -1732,7 +1733,7 @@ HOdata$periodo_flor <- HOdata$dias_fin_flor - HOdata$dias_flor
 HOdata.periodo_flor <- subset(HOdata, !is.na(periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = HOdata.periodo_flor, family = nbinom2, na.action = na.fail)
+HOperiodo_flormodel <- glmmTMB(periodo_flor ~ trat + clip + trat:clip, data = HOdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.periodo_flor)
 sample_size
@@ -1843,7 +1844,7 @@ HOdata$periodo_fruto <- HOdata$dias_fin_fruto - HOdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
 
- HOperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = HOdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
+ HOperiodo_frutomodel <- glmmTMB(periodo_fruto ~ trat + clip + trat:clip, data = HOdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(HOdata.periodo_fruto) 
 
@@ -2004,7 +2005,7 @@ R² = **`r rsq`**
 HOdata.dias_muerte <- subset(HOdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = HOdata.dias_muerte, family = nbinom2, na.action = na.fail)
+HOdias_muertemodel <- glmmTMB(dias_muerte ~ trat + clip + trat:clip, data = HOdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(HOdata.dias_muerte)
 # Extract the formula from the model
@@ -2226,7 +2227,7 @@ plot_HO_variable(HOdata.fenoles, fenoles)
 HOdata.biomass <- subset(HOdata, !is.na(biomass))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HObiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = HOdata.biomass, na.action = na.fail)
+HObiomassmodel <- lm(biomass ~ trat + clip + trat:clip, data = HOdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(HOdata.biomass)
 # Extract the formula from the model
@@ -2333,7 +2334,7 @@ plot_HO_variable(HOdata, biomass)
 HOdata.AvgDiam.mm. <- subset(HOdata, !is.na(AvgDiam.mm.))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = HOdata.AvgDiam.mm., na.action = na.fail)
+HOAvgDiam.mm.model <- lm(AvgDiam.mm. ~ trat + clip + trat:clip, data = HOdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(HOdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2440,7 +2441,7 @@ plot_HO_variable(HOdata, AvgDiam.mm.)
 HOdata.RTD <- subset(HOdata, !is.na(RTD))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HORTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = HOdata.RTD, na.action = na.fail)
+HORTDmodel <- lm(RTD ~ trat + clip + trat:clip, data = HOdata.RTD, na.action = na.fail)
 
 sample_size <- nrow(HOdata.RTD)
 # Extract the formula from the model
@@ -2547,7 +2548,7 @@ plot_HO_variable(HOdata, RTD)
 HOdata.SRL <- subset(HOdata, !is.na(SRL))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-HOSRLmodel <- lm((SRL) ~ trat + clip + trat:clip, data = HOdata.SRL, na.action = na.fail)
+HOSRLmodel <- lm(SRL ~ trat + clip + trat:clip, data = HOdata.SRL, na.action = na.fail)
 
 sample_size <- nrow(HOdata.SRL)
 # Extract the formula from the model
@@ -2644,4 +2645,318 @@ anova_SRL %>%
 ```{r PLOTTING HO SRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 plot_HO_variable(HOdata, SRL)
 
+```
+
+```{r Función para efectos principales, include = FALSE, message=FALSE}
+
+extract_main_effect <- function(model, factor_name){
+
+  emm <- emmeans(
+    model,
+    specs = factor_name,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+  # Para glm/glmmTMB
+  if("response" %in% names(tab)){
+
+    mu1 <- tab$response[1]
+    mu2 <- tab$response[2]
+
+  }
+
+  # Para lm gaussianos
+  else if("emmean" %in% names(tab)){
+
+    mu1 <- tab$emmean[1]
+    mu2 <- tab$emmean[2]
+
+  }
+
+  effect <- 100 * (mu2 - mu1) / abs(mu1)
+
+  pval <- summary(
+    pairs(emm),
+    infer = TRUE
+  )$p.value[1]
+
+  symbol <- dplyr::case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+```
+
+```{r Función para efectos interactivos, include=FALSE, message=FALSE}
+extract_interaction <- function(model){
+
+  emm <- emmeans(
+    model,
+    ~ trat * clip,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+value_col <- if("response" %in% names(tab)) "response" else "emmean"
+
+ex_no   <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="no"]
+ex_yes  <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="yes"]
+gra_no  <- tab[[value_col]][tab$trat=="gra" & tab$clip=="no"]
+gra_yes <- tab[[value_col]][tab$trat=="gra" & tab$clip=="yes"]
+
+  clip_ex  <- (ex_yes - ex_no) / ex_no
+  clip_gra <- (gra_yes - gra_no) / gra_no
+
+  interaction_effect <- 100 * (clip_gra - clip_ex)
+
+  jt <- as.data.frame(joint_tests(model))
+
+  pval <- jt %>%
+    filter(`model term` == "trat:clip") %>%
+    pull(p.value)
+
+  symbol <- case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = interaction_effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+
+```
+
+
+```{r Construyendo las matrices, include=FALSE, message=FALSE}
+models <- list(
+  flor        = HOflormodel,
+  fruto       = HOfrutomodel,
+  hojas       = HOhojasmodel,
+  altura      = HOalturamodel,
+  seedfruto   = HOseedfrutomodel,
+  seedtotal   = HOseedtotalmodel,
+  massseed    = HOmassseedmodel,
+  SLA         = HOSLAmodel,
+  LDMC        = HOLDMCmodel,
+  area.m        = HOarea.mmodel,
+  Photosyn    = HOPhotosynmodel,
+  Conductance = HOConductancemodel,
+  PhiPS2      = HOPhiPS2model,
+  fenoles     = HOfenolesmodel,
+  dias_flor   = HOdias_flormodel,
+  dias_fruto  = HOdias_frutomodel,
+  periodo_flor   = HOperiodo_flormodel,
+  periodo_fruto  = HOperiodo_frutomodel,
+  biomass     = HObiomassmodel,
+  AvgDiam.mm.     = HOAvgDiam.mm.model,
+  RTD         = HORTDmodel,
+  SRL         = HOSRLmodel
+)
+
+
+# Dataframe efectos parentales
+P_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "trat") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de efectos within-generation
+W_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "clip") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de interacción
+PxW_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_interaction(models[[trait_name]]) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Comprueba resultados:
+head(P_data)
+head(W_data)
+head(PxW_data)
+
+
+# Guardar resultados
+write.table(
+  P_data,
+  "HO_parental_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  W_data,
+  "HO_clipping_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  PxW_data,
+  "HO_interaction_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+```
+
+```{r Extraemos y guardamos datos de emmeans, include=FALSE, message=FALSE}
+
+parental_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+write.csv(
+  parental_emm,
+  "HO_parental_emmeans.csv",
+  row.names = FALSE
+)
+
+interaction_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat * clip,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+
+write.csv(
+  interaction_emm,
+  "HO_interaction_emmeans.csv",
+  row.names = FALSE
+)
 ```

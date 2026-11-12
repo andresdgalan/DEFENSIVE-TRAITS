@@ -22,6 +22,7 @@ library(car)
 library(scales)
 library(here)
 library(glmmTMB)
+library(purrr)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -118,7 +119,7 @@ plot_CA_variable <- function(data, response_var) {
 CAdata.flor <- subset(CAdata, !is.na(flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAflormodel <- glmmTMB((flor) ~ trat + clip + trat:clip, data = CAdata.flor, family = nbinom2, na.action = na.fail)
+CAflormodel <- glmmTMB(flor ~ trat + clip + trat:clip, data = CAdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.flor)
 # Extract the formula from the model
@@ -224,7 +225,7 @@ plot_CA_variable(CAdata, flor)
 CAdata.fruto <- subset(CAdata, !is.na(fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = CAdata.fruto, family = nbinom2, na.action = na.fail)
+CAfrutomodel <- glmmTMB(fruto ~ trat + clip + trat:clip, data = CAdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.fruto)
 # Extract the formula from the model
@@ -330,7 +331,7 @@ plot_CA_variable(CAdata, fruto)
 CAdata.hojas <- subset(CAdata, !is.na(hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = CAdata.hojas, family = nbinom2, na.action = na.fail)
+CAhojasmodel <- glmmTMB(hojas ~ trat + clip + trat:clip, data = CAdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.hojas)
 # Extract the formula from the model
@@ -435,7 +436,7 @@ plot_CA_variable(CAdata, hojas)
 CAdata.altura <- subset(CAdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAalturamodel <- lm((altura) ~ trat + clip + trat:clip, data = CAdata.altura, na.action = na.fail)
+CAalturamodel <- lm(altura ~ trat + clip + trat:clip, data = CAdata.altura, na.action = na.fail)
 
 sample_size <- nrow(CAdata.altura)
 # Extract the formula from the model
@@ -543,7 +544,7 @@ CAdata.seedfruto <- subset(CAdata, !is.na(seedfruto))
 CAdata.seedfruto$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = CAdata.seedfruto, family = nbinom2, na.action = na.fail)
+CAseedfrutomodel <- glmmTMB(seedfruto ~ trat + clip + trat:clip, data = CAdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.seedfruto)
 # Extract the formula from the model
@@ -649,7 +650,7 @@ plot_CA_variable(CAdata, seedfruto)
 CAdata.seedtotal <- subset(CAdata, !is.na(seedtotal))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = CAdata.seedtotal, family = nbinom2, na.action = na.fail)
+CAseedtotalmodel <- glmmTMB(seedtotal ~ trat + clip + trat:clip, data = CAdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.seedtotal)
 # Extract the formula from the model
@@ -755,7 +756,7 @@ plot_CA_variable(CAdata, seedtotal)
 CAdata.massseed <- subset(CAdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = CAdata.massseed, na.action = na.fail)
+CAmassseedmodel <- lm(massseed ~ trat + clip + trat:clip, data = CAdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(CAdata.massseed)
 # Extract the formula from the model
@@ -867,7 +868,7 @@ CAdata.SLA <- subset(CAdata, !is.na(SLA))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CASLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = CAdata.SLA, na.action = na.fail)
+CASLAmodel <- lm(SLA ~ trat + clip + trat:clip, data = CAdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(CAdata.SLA)
 # Extract the formula from the model
@@ -975,7 +976,7 @@ CAdata.LDMC <- subset(CAdata, !is.na(LDMC))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CALDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = CAdata.LDMC, na.action = na.fail)
+CALDMCmodel <- lm(LDMC ~ trat + clip + trat:clip, data = CAdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(CAdata.LDMC)
 # Extract the formula from the model
@@ -1080,7 +1081,7 @@ plot_CA_variable(CAdata, LDMC)
 CAdata.area.m <- subset(CAdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = CAdata.area.m, na.action = na.fail)
+CAarea.mmodel <- lm(area.m ~ trat + clip + trat:clip, data = CAdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(CAdata.area.m)
 # Extract the formula from the model
@@ -1186,7 +1187,7 @@ plot_CA_variable(CAdata, area.m)
 CAdata.dias_flor <- subset(CAdata, !is.na(dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = CAdata.dias_flor, family = nbinom2, na.action = na.fail)
+CAdias_flormodel <- glmmTMB(dias_flor ~ trat + clip + trat:clip, data = CAdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_flor)
 sample_size
@@ -1293,7 +1294,7 @@ plot_CA_variable(CAdata, dias_flor)
 CAdata.dias_fruto <- subset(CAdata, !is.na(dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = CAdata.dias_fruto, family = nbinom2, na.action = na.fail)
+CAdias_frutomodel <- glmmTMB(dias_fruto ~ trat + clip + trat:clip, data = CAdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_fruto)
 sample_size
@@ -1403,7 +1404,7 @@ CAdata$periodo_flor <- CAdata$dias_fin_flor - CAdata$dias_flor
 CAdata.periodo_flor <- subset(CAdata, !is.na(periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = CAdata.periodo_flor, family = nbinom2, na.action = na.fail)
+CAperiodo_flormodel <- glmmTMB(periodo_flor ~ trat + clip + trat:clip, data = CAdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.periodo_flor)
 sample_size
@@ -1514,7 +1515,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
 
- CAperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = CAdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
+ CAperiodo_frutomodel <- glmmTMB(periodo_fruto ~ trat + clip + trat:clip, data = CAdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(CAdata.periodo_fruto) 
 
@@ -1679,7 +1680,7 @@ CAdata$periodo_fruto <- CAdata$dias_fin_fruto - CAdata$dias_fruto
 CAdata.dias_muerte <- subset(CAdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = CAdata.dias_muerte, family = nbinom2, na.action = na.fail)
+CAdias_muertemodel <- glmmTMB(dias_muerte ~ trat + clip + trat:clip, data = CAdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(CAdata.dias_muerte)
 # Extract the formula from the model
@@ -1785,7 +1786,7 @@ plot_CA_variable(CAdata, dias_muerte)
 CAdata.fenoles <- subset(CAdata, !is.na(fenoles))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = CAdata.fenoles, na.action = na.fail)
+CAfenolesmodel <- lm(fenoles ~ trat + clip + trat:clip, data = CAdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(CAdata.fenoles)
 # Extract the formula from the model
@@ -1890,7 +1891,7 @@ plot_CA_variable(CAdata, fenoles)
 CAdata.biomass <- subset(CAdata, !is.na(biomass))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = CAdata.biomass, na.action = na.fail)
+CAbiomassmodel <- lm(biomass ~ trat + clip + trat:clip, data = CAdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(CAdata.biomass)
 # Extract the formula from the model
@@ -1997,7 +1998,7 @@ plot_CA_variable(CAdata, biomass)
 CAdata.AvgDiam.mm. <- subset(CAdata, !is.na(AvgDiam.mm.))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CAAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = CAdata.AvgDiam.mm., na.action = na.fail)
+CAAvgDiam.mm.model <- lm(AvgDiam.mm. ~ trat + clip + trat:clip, data = CAdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(CAdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2104,7 +2105,7 @@ plot_CA_variable(CAdata, AvgDiam.mm.)
 CAdata.RTD <- subset(CAdata, !is.na(RTD))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CARTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = CAdata.RTD, na.action = na.fail)
+CARTDmodel <- lm(RTD ~ trat + clip + trat:clip, data = CAdata.RTD, na.action = na.fail)
 
 sample_size <- nrow(CAdata.RTD)
 # Extract the formula from the model
@@ -2211,7 +2212,7 @@ plot_CA_variable(CAdata, RTD)
 CAdata.SRL <- subset(CAdata, !is.na(SRL))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-CASRLmodel <- glmmTMB((SRL) ~ trat + clip + trat:clip, data = CAdata.SRL, family = Gamma(link = "log"), na.action = na.fail)
+CASRLmodel <- glmmTMB(SRL ~ trat + clip + trat:clip, data = CAdata.SRL, family = Gamma(link = "log"), na.action = na.fail)
 
 sample_size <- nrow(CAdata.SRL)
 # Extract the formula from the model
@@ -2308,4 +2309,315 @@ anova_SRL %>%
 ```{r PLOTTING CA SRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 plot_CA_variable(CAdata, SRL)
 
+```
+
+```{r Función para efectos principales, include = FALSE, message=FALSE}
+
+extract_main_effect <- function(model, factor_name){
+
+  emm <- emmeans(
+    model,
+    specs = factor_name,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+  # Para glm/glmmTMB
+  if("response" %in% names(tab)){
+
+    mu1 <- tab$response[1]
+    mu2 <- tab$response[2]
+
+  }
+
+  # Para lm gaussianos
+  else if("emmean" %in% names(tab)){
+
+    mu1 <- tab$emmean[1]
+    mu2 <- tab$emmean[2]
+
+  }
+
+  effect <- 100 * (mu2 - mu1) / abs(mu1)
+
+  pval <- summary(
+    pairs(emm),
+    infer = TRUE
+  )$p.value[1]
+
+  symbol <- dplyr::case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+```
+
+```{r Función para efectos interactivos, include=FALSE, message=FALSE}
+extract_interaction <- function(model){
+
+  emm <- emmeans(
+    model,
+    ~ trat * clip,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+value_col <- if("response" %in% names(tab)) "response" else "emmean"
+
+ex_no   <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="no"]
+ex_yes  <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="yes"]
+gra_no  <- tab[[value_col]][tab$trat=="gra" & tab$clip=="no"]
+gra_yes <- tab[[value_col]][tab$trat=="gra" & tab$clip=="yes"]
+
+  clip_ex  <- (ex_yes - ex_no) / ex_no
+  clip_gra <- (gra_yes - gra_no) / gra_no
+
+  interaction_effect <- 100 * (clip_gra - clip_ex)
+
+  jt <- as.data.frame(joint_tests(model))
+
+  pval <- jt %>%
+    filter(`model term` == "trat:clip") %>%
+    pull(p.value)
+
+  symbol <- case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = interaction_effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+
+```
+
+
+```{r Construyendo las matrices, include=FALSE, message=FALSE}
+models <- list(
+  flor        = CAflormodel,
+  fruto       = CAfrutomodel,
+  hojas       = CAhojasmodel,
+  altura      = CAalturamodel,
+  seedfruto   = CAseedfrutomodel,
+  seedtotal   = CAseedtotalmodel,
+  massseed    = CAmassseedmodel,
+  SLA         = CASLAmodel,
+  LDMC        = CALDMCmodel,
+  area.m        = CAarea.mmodel,
+  fenoles     = CAfenolesmodel,
+  dias_flor   = CAdias_flormodel,
+  dias_fruto  = CAdias_frutomodel,
+  periodo_flor   = CAperiodo_flormodel,
+  periodo_fruto  = CAperiodo_frutomodel,
+  biomass     = CAbiomassmodel,
+  AvgDiam.mm.     = CAAvgDiam.mm.model,
+  RTD         = CARTDmodel,
+  SRL         = CASRLmodel
+)
+
+
+# Dataframe efectos parentales
+P_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "trat") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de efectos within-generation
+W_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "clip") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de interacción
+PxW_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_interaction(models[[trait_name]]) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Comprueba resultados:
+head(P_data)
+head(W_data)
+head(PxW_data)
+
+
+# Guardar resultados
+write.table(
+  P_data,
+  "CA_parental_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  W_data,
+  "CA_clipping_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  PxW_data,
+  "CA_interaction_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+```
+
+```{r Extraemos y guardamos datos de emmeans, include=FALSE, message=FALSE}
+
+parental_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+write.csv(
+  parental_emm,
+  "CA_parental_emmeans.csv",
+  row.names = FALSE
+)
+
+interaction_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat * clip,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+
+write.csv(
+  interaction_emm,
+  "CA_interaction_emmeans.csv",
+  row.names = FALSE
+)
 ```

@@ -22,6 +22,7 @@ library(car)
 library(scales)
 library(here)
 library(glmmTMB)
+library(purrr)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -118,7 +119,7 @@ plot_ME_variable <- function(data, response_var) {
 MEdata.flor <- subset(MEdata, !is.na(flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEflormodel <- glmmTMB((flor) ~ trat + clip + trat:clip, data = MEdata.flor, family = nbinom2, na.action = na.fail)
+MEflormodel <- glmmTMB(flor ~ trat + clip + trat:clip, data = MEdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.flor)
 # Extract the formula from the model
@@ -224,7 +225,7 @@ plot_ME_variable(MEdata, flor)
 MEdata.fruto <- subset(MEdata, !is.na(fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = MEdata.fruto, family = nbinom2, na.action = na.fail)
+MEfrutomodel <- glmmTMB(fruto ~ trat + clip + trat:clip, data = MEdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.fruto)
 # Extract the formula from the model
@@ -331,7 +332,7 @@ MEdata.hojas <- subset(MEdata, !is.na(hojas))
 plot(density(MEdata.hojas$hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = MEdata.hojas, family = nbinom2, na.action = na.fail)
+MEhojasmodel <- glmmTMB(hojas ~ trat + clip + trat:clip, data = MEdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.hojas)
 # Extract the formula from the model
@@ -436,7 +437,7 @@ plot_ME_variable(MEdata, hojas)
 MEdata.altura <- subset(MEdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEalturamodel <- lm((altura) ~ trat + clip + trat:clip, data = MEdata.altura, na.action = na.fail)
+MEalturamodel <- lm(altura ~ trat + clip + trat:clip, data = MEdata.altura, na.action = na.fail)
 
 sample_size <- nrow(MEdata.altura)
 # Extract the formula from the model
@@ -544,7 +545,7 @@ MEdata.seedfruto <- subset(MEdata, !is.na(seedfruto))
 MEdata.seedfruto$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = MEdata.seedfruto, family = nbinom2, na.action = na.fail)
+MEseedfrutomodel <- glmmTMB(seedfruto ~ trat + clip + trat:clip, data = MEdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.seedfruto)
 # Extract the formula from the model
@@ -650,7 +651,7 @@ plot_ME_variable(MEdata, seedfruto)
 MEdata.seedtotal <- subset(MEdata, !is.na(seedtotal))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = MEdata.seedtotal, family = nbinom2, na.action = na.fail)
+MEseedtotalmodel <- glmmTMB(seedtotal ~ trat + clip + trat:clip, data = MEdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.seedtotal)
 # Extract the formula from the model
@@ -756,7 +757,7 @@ plot_ME_variable(MEdata, seedtotal)
 MEdata.massseed <- subset(MEdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = MEdata.massseed, na.action = na.fail)
+MEmassseedmodel <- lm(massseed ~ trat + clip + trat:clip, data = MEdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(MEdata.massseed)
 # Extract the formula from the model
@@ -868,7 +869,7 @@ out$id
 MEdata.SLA <- MEdata.SLA[!MEdata.SLA$id %in% c(373,376,379,401), ]
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MESLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = MEdata.SLA, na.action = na.fail)
+MESLAmodel <- lm(SLA ~ trat + clip + trat:clip, data = MEdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(MEdata.SLA)
 # Extract the formula from the model
@@ -976,7 +977,7 @@ MEdata.LDMC <- subset(MEdata, !is.na(LDMC))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MELDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = MEdata.LDMC, na.action = na.fail)
+MELDMCmodel <- lm(LDMC ~ trat + clip + trat:clip, data = MEdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(MEdata.LDMC)
 # Extract the formula from the model
@@ -1081,7 +1082,7 @@ plot_ME_variable(MEdata, LDMC)
 MEdata.area.m <- subset(MEdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = MEdata.area.m, na.action = na.fail)
+MEarea.mmodel <- lm(area.m ~ trat + clip + trat:clip, data = MEdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(MEdata.area.m)
 # Extract the formula from the model
@@ -1189,7 +1190,7 @@ MEdata.dias_flor <- subset(MEdata, !is.na(dias_flor))
 plot(density(MEdata.dias_flor$dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = MEdata.dias_flor, family = nbinom2, na.action = na.fail)
+MEdias_flormodel <- glmmTMB(dias_flor ~ trat + clip + trat:clip, data = MEdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.dias_flor)
 sample_size
@@ -1296,7 +1297,7 @@ plot_ME_variable(MEdata, dias_flor)
 MEdata.dias_fruto <- subset(MEdata, !is.na(dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = MEdata.dias_fruto, family = nbinom2, na.action = na.fail)
+MEdias_frutomodel <- glmmTMB(dias_fruto ~ trat + clip + trat:clip, data = MEdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.dias_fruto)
 sample_size
@@ -1406,7 +1407,7 @@ MEdata$periodo_flor <- MEdata$dias_fin_flor - MEdata$dias_flor
 MEdata.periodo_flor <- subset(MEdata, !is.na(periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = MEdata.periodo_flor, family = nbinom2, na.action = na.fail)
+MEperiodo_flormodel <- glmmTMB(periodo_flor ~ trat + clip + trat:clip, data = MEdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.periodo_flor)
 sample_size
@@ -1517,7 +1518,7 @@ MEdata$periodo_fruto <- MEdata$dias_fin_fruto - MEdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
 
- MEperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = MEdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
+ MEperiodo_frutomodel <- glmmTMB(periodo_fruto ~ trat + clip + trat:clip, data = MEdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(MEdata.periodo_fruto) 
 
@@ -1682,7 +1683,7 @@ MEdata$periodo_fruto <- MEdata$dias_fin_fruto - MEdata$dias_fruto
 MEdata.dias_muerte <- subset(MEdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = MEdata.dias_muerte, family = nbinom2, na.action = na.fail)
+MEdias_muertemodel <- glmmTMB(dias_muerte ~ trat + clip + trat:clip, data = MEdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(MEdata.dias_muerte)
 # Extract the formula from the model
@@ -1788,7 +1789,7 @@ plot_ME_variable(MEdata, dias_muerte)
 MEdata.fenoles <- subset(MEdata, !is.na(fenoles))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = MEdata.fenoles, na.action = na.fail)
+MEfenolesmodel <- lm(fenoles ~ trat + clip + trat:clip, data = MEdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(MEdata.fenoles)
 # Extract the formula from the model
@@ -1893,7 +1894,7 @@ plot_ME_variable(MEdata, fenoles)
 MEdata.biomass <- subset(MEdata, !is.na(biomass))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = MEdata.biomass, na.action = na.fail)
+MEbiomassmodel <- lm(biomass ~ trat + clip + trat:clip, data = MEdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(MEdata.biomass)
 # Extract the formula from the model
@@ -2000,7 +2001,7 @@ plot_ME_variable(MEdata, biomass)
 MEdata.AvgDiam.mm. <- subset(MEdata, !is.na(AvgDiam.mm.))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MEAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = MEdata.AvgDiam.mm., na.action = na.fail)
+MEAvgDiam.mm.model <- lm(AvgDiam.mm. ~ trat + clip + trat:clip, data = MEdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(MEdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2107,7 +2108,7 @@ plot_ME_variable(MEdata, AvgDiam.mm.)
 MEdata.RTD <- subset(MEdata, !is.na(RTD))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MERTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = MEdata.RTD, na.action = na.fail)
+MERTDmodel <- lm(RTD ~ trat + clip + trat:clip, data = MEdata.RTD, na.action = na.fail)
 
 sample_size <- nrow(MEdata.RTD)
 # Extract the formula from the model
@@ -2214,7 +2215,7 @@ plot_ME_variable(MEdata, RTD)
 MEdata.SRL <- subset(MEdata, !is.na(SRL))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-MESRLmodel <- lm((SRL) ~ trat + clip + trat:clip, data = MEdata.SRL, na.action = na.fail)
+MESRLmodel <- lm(SRL ~ trat + clip + trat:clip, data = MEdata.SRL, na.action = na.fail)
 
 sample_size <- nrow(MEdata.SRL)
 # Extract the formula from the model
@@ -2311,4 +2312,315 @@ anova_SRL %>%
 ```{r PLOTTING ME SRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 plot_ME_variable(MEdata, SRL)
 
+```
+
+```{r Función para efectos principales, include = FALSE, message=FALSE}
+
+extract_main_effect <- function(model, factor_name){
+
+  emm <- emmeans(
+    model,
+    specs = factor_name,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+  # Para glm/glmmTMB
+  if("response" %in% names(tab)){
+
+    mu1 <- tab$response[1]
+    mu2 <- tab$response[2]
+
+  }
+
+  # Para lm gaussianos
+  else if("emmean" %in% names(tab)){
+
+    mu1 <- tab$emmean[1]
+    mu2 <- tab$emmean[2]
+
+  }
+
+  effect <- 100 * (mu2 - mu1) / abs(mu1)
+
+  pval <- summary(
+    pairs(emm),
+    infer = TRUE
+  )$p.value[1]
+
+  symbol <- dplyr::case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+```
+
+```{r Función para efectos interactivos, include=FALSE, message=FALSE}
+extract_interaction <- function(model){
+
+  emm <- emmeans(
+    model,
+    ~ trat * clip,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+value_col <- if("response" %in% names(tab)) "response" else "emmean"
+
+ex_no   <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="no"]
+ex_yes  <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="yes"]
+gra_no  <- tab[[value_col]][tab$trat=="gra" & tab$clip=="no"]
+gra_yes <- tab[[value_col]][tab$trat=="gra" & tab$clip=="yes"]
+
+  clip_ex  <- (ex_yes - ex_no) / ex_no
+  clip_gra <- (gra_yes - gra_no) / gra_no
+
+  interaction_effect <- 100 * (clip_gra - clip_ex)
+
+  jt <- as.data.frame(joint_tests(model))
+
+  pval <- jt %>%
+    filter(`model term` == "trat:clip") %>%
+    pull(p.value)
+
+  symbol <- case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = interaction_effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+
+```
+
+
+```{r Construyendo las matrices, include=FALSE, message=FALSE}
+models <- list(
+  flor        = MEflormodel,
+  fruto       = MEfrutomodel,
+  hojas       = MEhojasmodel,
+  altura      = MEalturamodel,
+  seedfruto   = MEseedfrutomodel,
+  seedtotal   = MEseedtotalmodel,
+  massseed    = MEmassseedmodel,
+  SLA         = MESLAmodel,
+  LDMC        = MELDMCmodel,
+  area.m        = MEarea.mmodel,
+  fenoles     = MEfenolesmodel,
+  dias_flor   = MEdias_flormodel,
+  dias_fruto  = MEdias_frutomodel,
+  periodo_flor   = MEperiodo_flormodel,
+  periodo_fruto  = MEperiodo_frutomodel,
+  biomass     = MEbiomassmodel,
+  AvgDiam.mm.     = MEAvgDiam.mm.model,
+  RTD         = MERTDmodel,
+  SRL         = MESRLmodel
+)
+
+
+# Dataframe efectos parentales
+P_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "trat") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de efectos within-generation
+W_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "clip") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de interacción
+PxW_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_interaction(models[[trait_name]]) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Comprueba resultados:
+head(P_data)
+head(W_data)
+head(PxW_data)
+
+
+# Guardar resultados
+write.table(
+  P_data,
+  "ME_parental_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  W_data,
+  "ME_clipping_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  PxW_data,
+  "ME_interaction_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+```
+
+```{r Extraemos y guardamos datos de emmeans, include=FALSE, message=FALSE}
+
+parental_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+write.csv(
+  parental_emm,
+  "ME_parental_emmeans.csv",
+  row.names = FALSE
+)
+
+interaction_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat * clip,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+
+write.csv(
+  interaction_emm,
+  "ME_interaction_emmeans.csv",
+  row.names = FALSE
+)
 ```

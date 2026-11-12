@@ -22,6 +22,7 @@ library(car)
 library(scales)
 library(here)
 library(glmmTMB)
+library(purrr)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -224,7 +225,7 @@ plot_AV_variable(AVdata, flor)
 AVdata.fruto <- subset(AVdata, !is.na(fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = AVdata.fruto, family = nbinom2, na.action = na.fail)
+AVfrutomodel <- glmmTMB(fruto ~ trat + clip + trat:clip, data = AVdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.fruto)
 # Extract the formula from the model
@@ -330,7 +331,7 @@ plot_AV_variable(AVdata, fruto)
 AVdata.hojas <- subset(AVdata, !is.na(hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = AVdata.hojas, family = nbinom2, na.action = na.fail)
+AVhojasmodel <- glmmTMB(hojas ~ trat + clip + trat:clip, data = AVdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.hojas)
 # Extract the formula from the model
@@ -435,7 +436,7 @@ plot_AV_variable(AVdata, hojas)
 AVdata.altura <- subset(AVdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AValturamodel <- lm((altura) ~ trat + clip + trat:clip, data = AVdata.altura, na.action = na.fail)
+AValturamodel <- lm(altura ~ trat + clip + trat:clip, data = AVdata.altura, na.action = na.fail)
 
 sample_size <- nrow(AVdata.altura)
 # Extract the formula from the model
@@ -543,7 +544,7 @@ AVdata.seedfruto <- subset(AVdata, !is.na(seedfruto))
 AVdata.seedfruto$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = AVdata.seedfruto, family = nbinom2, na.action = na.fail)
+AVseedfrutomodel <- glmmTMB(seedfruto ~ trat + clip + trat:clip, data = AVdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.seedfruto)
 # Extract the formula from the model
@@ -649,7 +650,7 @@ plot_AV_variable(AVdata, seedfruto)
 AVdata.seedtotal <- subset(AVdata, !is.na(seedtotal))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = AVdata.seedtotal, family = nbinom2, na.action = na.fail)
+AVseedtotalmodel <- glmmTMB(seedtotal ~ trat + clip + trat:clip, data = AVdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.seedtotal)
 # Extract the formula from the model
@@ -755,7 +756,7 @@ plot_AV_variable(AVdata, seedtotal)
 AVdata.massseed <- subset(AVdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = AVdata.massseed, na.action = na.fail)
+AVmassseedmodel <- lm(massseed ~ trat + clip + trat:clip, data = AVdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(AVdata.massseed)
 # Extract the formula from the model
@@ -860,7 +861,7 @@ plot_AV_variable(AVdata, massseed)
 AVdata.SLA <- subset(AVdata, !is.na(SLA))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVSLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = AVdata.SLA, na.action = na.fail)
+AVSLAmodel <- lm(SLA ~ trat + clip + trat:clip, data = AVdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(AVdata.SLA)
 # Extract the formula from the model
@@ -976,7 +977,7 @@ AVdata.LDMC <- AVdata.LDMC[AVdata.LDMC$id!= 241, ]
 
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVLDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = AVdata.LDMC, na.action = na.fail)
+AVLDMCmodel <- lm(LDMC ~ trat + clip + trat:clip, data = AVdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(AVdata.LDMC)
 # Extract the formula from the model
@@ -1081,7 +1082,7 @@ plot_AV_variable(AVdata.LDMC, LDMC)
 AVdata.area.m <- subset(AVdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = AVdata.area.m, na.action = na.fail)
+AVarea.mmodel <- lm(area.m ~ trat + clip + trat:clip, data = AVdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(AVdata.area.m)
 # Extract the formula from the model
@@ -1186,7 +1187,7 @@ plot_AV_variable(AVdata, area.m)
 AVdata.Photosyn <- subset(AVdata, !is.na(Photosyn))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVPhotosynmodel <- lm((Photosyn) ~ trat + clip + trat:clip, data = AVdata.Photosyn, na.action = na.fail)
+AVPhotosynmodel <- lm(Photosyn ~ trat + clip + trat:clip, data = AVdata.Photosyn, na.action = na.fail)
 
 sample_size <- nrow(AVdata.Photosyn)
 # Extract the formula from the model
@@ -1292,7 +1293,7 @@ plot_AV_variable(AVdata, Photosyn)
 AVdata.Conductance <- subset(AVdata, !is.na(Conductance))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVConductancemodel <- lm((Conductance) ~ trat + clip + trat:clip, data = AVdata.Conductance, na.action = na.fail)
+AVConductancemodel <- lm(Conductance ~ trat + clip + trat:clip, data = AVdata.Conductance, na.action = na.fail)
 
 sample_size <- nrow(AVdata.Conductance)
 # Extract the formula from the model
@@ -1398,7 +1399,7 @@ plot_AV_variable(AVdata, Conductance)
 AVdata.PhiPS2 <- subset(AVdata, !is.na(PhiPS2))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVPhiPS2model <- lm((PhiPS2) ~ trat + clip + trat:clip, data = AVdata.PhiPS2, na.action = na.fail)
+AVPhiPS2model <- lm(PhiPS2 ~ trat + clip + trat:clip, data = AVdata.PhiPS2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.PhiPS2)
 # Extract the formula from the model
@@ -1504,7 +1505,7 @@ plot_AV_variable(AVdata, PhiPS2)
 AVdata.dias_flor <- subset(AVdata, !is.na(dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = AVdata.dias_flor, family = nbinom2, na.action = na.fail)
+AVdias_flormodel <- glmmTMB(dias_flor ~ trat + clip + trat:clip, data = AVdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_flor)
 sample_size
@@ -1611,7 +1612,7 @@ plot_AV_variable(AVdata, dias_flor)
 AVdata.dias_fruto <- subset(AVdata, !is.na(dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = AVdata.dias_fruto, family = nbinom2, na.action = na.fail)
+AVdias_frutomodel <- glmmTMB(dias_fruto ~ trat + clip + trat:clip, data = AVdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_fruto)
 sample_size
@@ -1721,7 +1722,7 @@ AVdata$periodo_flor <- AVdata$dias_fin_flor - AVdata$dias_flor
 AVdata.periodo_flor <- subset(AVdata, !is.na(periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = AVdata.periodo_flor, family = nbinom2, na.action = na.fail)
+AVperiodo_flormodel <- glmmTMB(periodo_flor ~ trat + clip + trat:clip, data = AVdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.periodo_flor)
 sample_size
@@ -1832,7 +1833,7 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos 
 
- AVperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = AVdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
+ AVperiodo_frutomodel <- glmmTMB(periodo_fruto ~ trat + clip + trat:clip, data = AVdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(AVdata.periodo_fruto) 
 
@@ -1997,7 +1998,7 @@ AVdata$periodo_fruto <- AVdata$dias_fin_fruto - AVdata$dias_fruto
 AVdata.dias_muerte <- subset(AVdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = AVdata.dias_muerte, family = nbinom2, na.action = na.fail)
+AVdias_muertemodel <- glmmTMB(dias_muerte ~ trat + clip + trat:clip, data = AVdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(AVdata.dias_muerte)
 # Extract the formula from the model
@@ -2103,7 +2104,7 @@ plot_AV_variable(AVdata, dias_muerte)
 AVdata.fenoles <- subset(AVdata, !is.na(fenoles))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = AVdata.fenoles, na.action = na.fail)
+AVfenolesmodel <- lm(fenoles ~ trat + clip + trat:clip, data = AVdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(AVdata.fenoles)
 # Extract the formula from the model
@@ -2208,7 +2209,7 @@ plot_AV_variable(AVdata, fenoles)
 AVdata.biomass <- subset(AVdata, !is.na(biomass))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = AVdata.biomass, na.action = na.fail)
+AVbiomassmodel <- lm(biomass ~ trat + clip + trat:clip, data = AVdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(AVdata.biomass)
 # Extract the formula from the model
@@ -2315,7 +2316,7 @@ plot_AV_variable(AVdata, biomass)
 AVdata.AvgDiam.mm. <- subset(AVdata, !is.na(AvgDiam.mm.))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = AVdata.AvgDiam.mm., na.action = na.fail)
+AVAvgDiam.mm.model <- lm(AvgDiam.mm. ~ trat + clip + trat:clip, data = AVdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(AVdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2422,7 +2423,7 @@ plot_AV_variable(AVdata, AvgDiam.mm.)
 AVdata.RTD <- subset(AVdata, !is.na(RTD))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVRTDmodel <- lm((RTD) ~ trat + clip + trat:clip, data = AVdata.RTD, na.action = na.fail)
+AVRTDmodel <- lm(RTD ~ trat + clip + trat:clip, data = AVdata.RTD, na.action = na.fail)
 
 sample_size <- nrow(AVdata.RTD)
 # Extract the formula from the model
@@ -2529,7 +2530,7 @@ plot_AV_variable(AVdata, RTD)
 AVdata.SRL <- subset(AVdata, !is.na(SRL))
 
 #probamos el modelo con distintas transformaciones y familias de glmmTMB para ver cuál es el que mejor se ajusta a los datos
-AVSRLmodel <- lm((SRL) ~ trat + clip + trat:clip, data = AVdata.SRL, na.action = na.fail)
+AVSRLmodel <- lm(SRL ~ trat + clip + trat:clip, data = AVdata.SRL, na.action = na.fail)
 
 sample_size <- nrow(AVdata.SRL)
 # Extract the formula from the model
@@ -2626,4 +2627,318 @@ anova_SRL %>%
 ```{r PLOTTING AV SRL, echo=FALSE, results='hold', warning=FALSE, message=FALSE}
 plot_AV_variable(AVdata, SRL)
 
+```
+
+```{r Función para efectos principales, include = FALSE, message=FALSE}
+
+extract_main_effect <- function(model, factor_name){
+
+  emm <- emmeans(
+    model,
+    specs = factor_name,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+  # Para glm/glmmTMB
+  if("response" %in% names(tab)){
+
+    mu1 <- tab$response[1]
+    mu2 <- tab$response[2]
+
+  }
+
+  # Para lm gaussianos
+  else if("emmean" %in% names(tab)){
+
+    mu1 <- tab$emmean[1]
+    mu2 <- tab$emmean[2]
+
+  }
+
+  effect <- 100 * (mu2 - mu1) / abs(mu1)
+
+  pval <- summary(
+    pairs(emm),
+    infer = TRUE
+  )$p.value[1]
+
+  symbol <- dplyr::case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+```
+
+```{r Función para efectos interactivos, include=FALSE, message=FALSE}
+extract_interaction <- function(model){
+
+  emm <- emmeans(
+    model,
+    ~ trat * clip,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+value_col <- if("response" %in% names(tab)) "response" else "emmean"
+
+ex_no   <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="no"]
+ex_yes  <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="yes"]
+gra_no  <- tab[[value_col]][tab$trat=="gra" & tab$clip=="no"]
+gra_yes <- tab[[value_col]][tab$trat=="gra" & tab$clip=="yes"]
+
+  clip_ex  <- (ex_yes - ex_no) / ex_no
+  clip_gra <- (gra_yes - gra_no) / gra_no
+
+  interaction_effect <- 100 * (clip_gra - clip_ex)
+
+  jt <- as.data.frame(joint_tests(model))
+
+  pval <- jt %>%
+    filter(`model term` == "trat:clip") %>%
+    pull(p.value)
+
+  symbol <- case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = interaction_effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+
+```
+
+
+```{r Construyendo las matrices, include=FALSE, message=FALSE}
+models <- list(
+  flor        = AVflormodel,
+  fruto       = AVfrutomodel,
+  hojas       = AVhojasmodel,
+  altura      = AValturamodel,
+  seedfruto   = AVseedfrutomodel,
+  seedtotal   = AVseedtotalmodel,
+  massseed    = AVmassseedmodel,
+  SLA         = AVSLAmodel,
+  LDMC        = AVLDMCmodel,
+  area.m        = AVarea.mmodel,
+  Photosyn    = AVPhotosynmodel,
+  Conductance = AVConductancemodel,
+  PhiPS2      = AVPhiPS2model,
+  fenoles     = AVfenolesmodel,
+  dias_flor   = AVdias_flormodel,
+  dias_fruto  = AVdias_frutomodel,
+  periodo_flor   = AVperiodo_flormodel,
+  periodo_fruto  = AVperiodo_frutomodel,
+  biomass     = AVbiomassmodel,
+  AvgDiam.mm.     = AVAvgDiam.mm.model,
+  RTD         = AVRTDmodel,
+  SRL         = AVSRLmodel
+)
+
+
+# Dataframe efectos parentales
+P_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "trat") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de efectos within-generation
+W_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "clip") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de interacción
+PxW_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_interaction(models[[trait_name]]) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Comprueba resultados:
+head(P_data)
+head(W_data)
+head(PxW_data)
+
+
+# Guardar resultados
+write.table(
+  P_data,
+  "AV_parental_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  W_data,
+  "AV_clipping_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  PxW_data,
+  "AV_interaction_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+```
+
+```{r Extraemos y guardamos datos de emmeans, include=FALSE, message=FALSE}
+
+parental_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+write.csv(
+  parental_emm,
+  "AV_parental_emmeans.csv",
+  row.names = FALSE
+)
+
+interaction_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat * clip,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+
+write.csv(
+  interaction_emm,
+  "AV_interaction_emmeans.csv",
+  row.names = FALSE
+)
 ```

@@ -22,6 +22,7 @@ library(car)
 library(scales)
 library(here)
 library(glmmTMB)
+library(purrr)
 
 data <- read.table(here("trait_data.csv"), header =T, sep = ",")
 datamother <- read.table("rawdata/seedmother.csv", header = TRUE, sep = ";")
@@ -121,7 +122,7 @@ plot(density(PLdata.flor$flor))
 PLdata.flor <- subset(PLdata.flor, flor != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLflormodel <- glmmTMB((flor) ~ trat + clip + trat:clip, data = PLdata.flor, family = nbinom2, na.action = na.fail)
+PLflormodel <- glmmTMB(flor ~ trat + clip + trat:clip, data = PLdata.flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.flor)
 # Extract the formula from the model
@@ -229,7 +230,7 @@ PLdata.fruto <- subset(PLdata, !is.na(fruto))
 PLdata.fruto <- subset(PLdata.fruto, fruto != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLfrutomodel <- glmmTMB((fruto) ~ trat + clip + trat:clip, data = PLdata.fruto, family = nbinom2, na.action = na.fail)
+PLfrutomodel <- glmmTMB(fruto ~ trat + clip + trat:clip, data = PLdata.fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.fruto)
 # Extract the formula from the model
@@ -335,7 +336,7 @@ plot_PL_variable(PLdata.fruto, fruto)
 PLdata.hojas <- subset(PLdata, !is.na(hojas))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLhojasmodel <- glmmTMB((hojas) ~ trat + clip + trat:clip, data = PLdata.hojas, family = nbinom2, na.action = na.fail)
+PLhojasmodel <- glmmTMB(hojas ~ trat + clip + trat:clip, data = PLdata.hojas, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.hojas)
 # Extract the formula from the model
@@ -440,7 +441,7 @@ plot_PL_variable(PLdata, hojas)
 PLdata.altura <- subset(PLdata, !is.na(altura))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLalturamodel <- lm((altura) ~ trat + clip + trat:clip, data = PLdata.altura, na.action = na.fail)
+PLalturamodel <- lm(altura ~ trat + clip + trat:clip, data = PLdata.altura, na.action = na.fail)
 
 sample_size <- nrow(PLdata.altura)
 # Extract the formula from the model
@@ -548,7 +549,7 @@ PLdata.seedfruto <- subset(PLdata, !is.na(seedfruto))
 PLdata.seedfruto$seedfruto
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLseedfrutomodel <- glmmTMB((seedfruto) ~ trat + clip + trat:clip, data = PLdata.seedfruto, family = nbinom2, na.action = na.fail)
+PLseedfrutomodel <- glmmTMB(seedfruto ~ trat + clip + trat:clip, data = PLdata.seedfruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.seedfruto)
 # Extract the formula from the model
@@ -656,7 +657,7 @@ PLdata.seedtotal <- subset(PLdata, !is.na(seedtotal))
 PLdata.seedtotal <- subset(PLdata.seedtotal, seedtotal != 0)
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLseedtotalmodel <- glmmTMB((seedtotal) ~ trat + clip + trat:clip, data = PLdata.seedtotal, family = nbinom2, na.action = na.fail)
+PLseedtotalmodel <- glmmTMB(seedtotal ~ trat + clip + trat:clip, data = PLdata.seedtotal, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.seedtotal)
 # Extract the formula from the model
@@ -762,7 +763,7 @@ plot_PL_variable(PLdata.seedtotal, seedtotal)
 PLdata.massseed <- subset(PLdata, !is.na(massseed))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLmassseedmodel <- lm((massseed) ~ trat + clip + trat:clip, data = PLdata.massseed, na.action = na.fail)
+PLmassseedmodel <- lm(massseed ~ trat + clip + trat:clip, data = PLdata.massseed, na.action = na.fail)
 
 sample_size <- nrow(PLdata.massseed)
 # Extract the formula from the model
@@ -871,7 +872,7 @@ max_row <- PLdata.SLA[which.max(PLdata.SLA$SLA), ]
 PLdata.SLA <- PLdata.SLA[PLdata.SLA$id!= 35, ]
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLSLAmodel <- lm((SLA) ~ trat + clip + trat:clip, data = PLdata.SLA, na.action = na.fail)
+PLSLAmodel <- lm(SLA ~ trat + clip + trat:clip, data = PLdata.SLA, na.action = na.fail)
 
 sample_size <- nrow(PLdata.SLA)
 # Extract the formula from the model
@@ -980,7 +981,7 @@ PLdata.LDMC <- subset(PLdata, !is.na(LDMC))
 
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLLDMCmodel <- lm((LDMC) ~ trat + clip + trat:clip, data = PLdata.LDMC, na.action = na.fail)
+PLLDMCmodel <- lm(LDMC ~ trat + clip + trat:clip, data = PLdata.LDMC, na.action = na.fail)
 
 sample_size <- nrow(PLdata.LDMC)
 # Extract the formula from the model
@@ -1085,7 +1086,7 @@ plot_PL_variable(PLdata, LDMC)
 PLdata.area.m <- subset(PLdata, !is.na(area.m))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLarea.mmodel <- lm((area.m) ~ trat + clip + trat:clip, data = PLdata.area.m, na.action = na.fail)
+PLarea.mmodel <- lm(area.m ~ trat + clip + trat:clip, data = PLdata.area.m, na.action = na.fail)
 
 sample_size <- nrow(PLdata.area.m)
 # Extract the formula from the model
@@ -1190,7 +1191,7 @@ plot_PL_variable(PLdata, area.m)
 PLdata.Photosyn <- subset(PLdata, !is.na(Photosyn))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLPhotosynmodel <- lm((Photosyn) ~ trat + clip + trat:clip, data = PLdata.Photosyn, na.action = na.fail)
+PLPhotosynmodel <- lm(Photosyn ~ trat + clip + trat:clip, data = PLdata.Photosyn, na.action = na.fail)
 
 sample_size <- nrow(PLdata.Photosyn)
 # Extract the formula from the model
@@ -1296,7 +1297,7 @@ plot_PL_variable(PLdata, Photosyn)
 PLdata.Conductance <- subset(PLdata, !is.na(Conductance))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLConductancemodel <- lm((Conductance) ~ trat + clip + trat:clip, data = PLdata.Conductance, na.action = na.fail)
+PLConductancemodel <- lm(Conductance ~ trat + clip + trat:clip, data = PLdata.Conductance, na.action = na.fail)
 
 sample_size <- nrow(PLdata.Conductance)
 # Extract the formula from the model
@@ -1402,7 +1403,7 @@ plot_PL_variable(PLdata, Conductance)
 PLdata.PhiPS2 <- subset(PLdata, !is.na(PhiPS2))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLPhiPS2model <- lm((PhiPS2) ~ trat + clip + trat:clip, data = PLdata.PhiPS2, na.action = na.fail)
+PLPhiPS2model <- lm(PhiPS2 ~ trat + clip + trat:clip, data = PLdata.PhiPS2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.PhiPS2)
 # Extract the formula from the model
@@ -1508,7 +1509,7 @@ plot_PL_variable(PLdata, PhiPS2)
 PLdata.dias_flor <- subset(PLdata, !is.na(dias_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLdias_flormodel <- glmmTMB((dias_flor) ~ trat + clip + trat:clip, data = PLdata.dias_flor, family = nbinom2, na.action = na.fail)
+PLdias_flormodel <- glmmTMB(dias_flor ~ trat + clip + trat:clip, data = PLdata.dias_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.dias_flor)
 sample_size
@@ -1616,7 +1617,7 @@ PLdata.dias_fruto <- subset(PLdata, !is.na(dias_fruto))
 plot(density(PLdata.dias_fruto$dias_fruto))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLdias_frutomodel <- glmmTMB((dias_fruto) ~ trat + clip + trat:clip, data = PLdata.dias_fruto, family = nbinom2, na.action = na.fail)
+PLdias_frutomodel <- glmmTMB(dias_fruto ~ trat + clip + trat:clip, data = PLdata.dias_fruto, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.dias_fruto)
 sample_size
@@ -1727,7 +1728,7 @@ PLdata.periodo_flor <- subset(PLdata, !is.na(periodo_flor))
 plot(density(PLdata.periodo_flor$periodo_flor))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLperiodo_flormodel <- glmmTMB((periodo_flor) ~ trat + clip + trat:clip, data = PLdata.periodo_flor, family = nbinom2, na.action = na.fail)
+PLperiodo_flormodel <- glmmTMB(periodo_flor ~ trat + clip + trat:clip, data = PLdata.periodo_flor, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.periodo_flor)
 sample_size
@@ -1838,7 +1839,7 @@ PLdata$periodo_fruto <- PLdata$dias_fin_fruto - PLdata$dias_fruto
 
  #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos 
 
- PLperiodo_frutomodel <- glmmTMB((periodo_fruto) ~ trat + clip + trat:clip, data = PLdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
+ PLperiodo_frutomodel <- glmmTMB(periodo_fruto ~ trat + clip + trat:clip, data = PLdata.periodo_fruto, family = nbinom2, na.action = na.fail) 
 
  sample_size <- nrow(PLdata.periodo_fruto) 
 
@@ -2003,7 +2004,7 @@ PLdata$periodo_fruto <- PLdata$dias_fin_fruto - PLdata$dias_fruto
 PLdata.dias_muerte <- subset(PLdata, !is.na(dias_muerte))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLdias_muertemodel <- glmmTMB((dias_muerte) ~ trat + clip + trat:clip, data = PLdata.dias_muerte, family = nbinom2, na.action = na.fail)
+PLdias_muertemodel <- glmmTMB(dias_muerte ~ trat + clip + trat:clip, data = PLdata.dias_muerte, family = nbinom2, na.action = na.fail)
 
 sample_size <- nrow(PLdata.dias_muerte)
 # Extract the formula from the model
@@ -2109,7 +2110,7 @@ plot_PL_variable(PLdata, dias_muerte)
 PLdata.fenoles <- subset(PLdata, !is.na(fenoles))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLfenolesmodel <- lm((fenoles) ~ trat + clip + trat:clip, data = PLdata.fenoles, na.action = na.fail)
+PLfenolesmodel <- lm(fenoles ~ trat + clip + trat:clip, data = PLdata.fenoles, na.action = na.fail)
 
 sample_size <- nrow(PLdata.fenoles)
 # Extract the formula from the model
@@ -2214,7 +2215,7 @@ plot_PL_variable(PLdata, fenoles)
 PLdata.biomass <- subset(PLdata, !is.na(biomass))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLbiomassmodel <- lm((biomass) ~ trat + clip + trat:clip, data = PLdata.biomass, na.action = na.fail)
+PLbiomassmodel <- lm(biomass ~ trat + clip + trat:clip, data = PLdata.biomass, na.action = na.fail)
 
 sample_size <- nrow(PLdata.biomass)
 # Extract the formula from the model
@@ -2321,7 +2322,7 @@ plot_PL_variable(PLdata, biomass)
 PLdata.AvgDiam.mm. <- subset(PLdata, !is.na(AvgDiam.mm.))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLAvgDiam.mm.model <- lm((AvgDiam.mm.) ~ trat + clip + trat:clip, data = PLdata.AvgDiam.mm., na.action = na.fail)
+PLAvgDiam.mm.model <- lm(AvgDiam.mm. ~ trat + clip + trat:clip, data = PLdata.AvgDiam.mm., na.action = na.fail)
 
 sample_size <- nrow(PLdata.AvgDiam.mm.)
 # Extract the formula from the model
@@ -2428,7 +2429,7 @@ plot_PL_variable(PLdata, AvgDiam.mm.)
 PLdata.RTD <- subset(PLdata, !is.na(RTD))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLRTDmodel <- glmmTMB((RTD) ~ trat + clip + trat:clip, data = PLdata.RTD, family = Gamma(link = "log"), na.action = na.fail)
+PLRTDmodel <- glmmTMB(RTD ~ trat + clip + trat:clip, data = PLdata.RTD, family = Gamma(link = "log"), na.action = na.fail)
 
 sample_size <- nrow(PLdata.RTD)
 # Extract the formula from the model
@@ -2535,7 +2536,7 @@ plot_PL_variable(PLdata, RTD)
 PLdata.SRL <- subset(PLdata, !is.na(SRL))
 
 #probamos el modelo con distintas transformaciones y familias de glm para ver cuál es el que mejor se ajusta a los datos
-PLSRLmodel <- glmmTMB((SRL) ~ trat + clip + trat:clip, data = PLdata.SRL, family = Gamma(link = "log"), na.action = na.fail)
+PLSRLmodel <- glmmTMB(SRL ~ trat + clip + trat:clip, data = PLdata.SRL, family = Gamma(link = "log"), na.action = na.fail)
 
 sample_size <- nrow(PLdata.SRL)
 # Extract the formula from the model
@@ -2633,3 +2634,318 @@ anova_SRL %>%
 plot_PL_variable(PLdata, SRL)
 
 ```
+
+```{r Función para efectos principales, include = FALSE, message=FALSE}
+
+extract_main_effect <- function(model, factor_name){
+
+  emm <- emmeans(
+    model,
+    specs = factor_name,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+  # Para glm/glmmTMB
+  if("response" %in% names(tab)){
+
+    mu1 <- tab$response[1]
+    mu2 <- tab$response[2]
+
+  }
+
+  # Para lm gaussianos
+  else if("emmean" %in% names(tab)){
+
+    mu1 <- tab$emmean[1]
+    mu2 <- tab$emmean[2]
+
+  }
+
+  effect <- 100 * (mu2 - mu1) / abs(mu1)
+
+  pval <- summary(
+    pairs(emm),
+    infer = TRUE
+  )$p.value[1]
+
+  symbol <- dplyr::case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+```
+
+```{r Función para efectos interactivos, include=FALSE, message=FALSE}
+extract_interaction <- function(model){
+
+  emm <- emmeans(
+    model,
+    ~ trat * clip,
+    type = "response"
+  )
+
+  tab <- as.data.frame(emm)
+
+value_col <- if("response" %in% names(tab)) "response" else "emmean"
+
+ex_no   <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="no"]
+ex_yes  <- tab[[value_col]][tab$trat=="ex"  & tab$clip=="yes"]
+gra_no  <- tab[[value_col]][tab$trat=="gra" & tab$clip=="no"]
+gra_yes <- tab[[value_col]][tab$trat=="gra" & tab$clip=="yes"]
+
+  clip_ex  <- (ex_yes - ex_no) / ex_no
+  clip_gra <- (gra_yes - gra_no) / gra_no
+
+  interaction_effect <- 100 * (clip_gra - clip_ex)
+
+  jt <- as.data.frame(joint_tests(model))
+
+  pval <- jt %>%
+    filter(`model term` == "trat:clip") %>%
+    pull(p.value)
+
+  symbol <- case_when(
+    pval < 0.001 ~ "***",
+    pval < 0.01  ~ "**",
+    pval < 0.05  ~ "*",
+    pval < 0.10  ~ "·",
+    TRUE         ~ ""
+  )
+
+  data.frame(
+    effect = interaction_effect,
+    pvalue = pval,
+    symbol = symbol
+  )
+
+}
+
+```
+
+
+```{r Construyendo las matrices, include=FALSE, message=FALSE}
+models <- list(
+  flor        = PLflormodel,
+  fruto       = PLfrutomodel,
+  hojas       = PLhojasmodel,
+  altura      = PLalturamodel,
+  seedfruto   = PLseedfrutomodel,
+  seedtotal   = PLseedtotalmodel,
+  massseed    = PLmassseedmodel,
+  SLA         = PLSLAmodel,
+  LDMC        = PLLDMCmodel,
+  area.m        = PLarea.mmodel,
+  Photosyn    = PLPhotosynmodel,
+  Conductance = PLConductancemodel,
+  PhiPS2      = PLPhiPS2model,
+  fenoles     = PLfenolesmodel,
+  dias_flor   = PLdias_flormodel,
+  dias_fruto  = PLdias_frutomodel,
+  periodo_flor   = PLperiodo_flormodel,
+  periodo_fruto  = PLperiodo_frutomodel,
+  biomass     = PLbiomassmodel,
+  AvgDiam.mm.     = PLAvgDiam.mm.model,
+  RTD         = PLRTDmodel,
+  SRL         = PLSRLmodel
+)
+
+
+# Dataframe efectos parentales
+P_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "trat") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de efectos within-generation
+W_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_main_effect(models[[trait_name]], "clip") %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Dataframe de interacción
+PxW_data <- map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      extract_interaction(models[[trait_name]]) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name,
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+
+    })
+
+  }
+)
+
+# Comprueba resultados:
+head(P_data)
+head(W_data)
+head(PxW_data)
+
+
+# Guardar resultados
+write.table(
+  P_data,
+  "PL_parental_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  W_data,
+  "PL_clipping_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+
+write.table(
+  PxW_data,
+  "PL_interaction_heatmap.csv",
+  sep = ",",
+  row.names = FALSE,
+  quote = FALSE
+)
+```
+
+```{r Extraemos y guardamos datos de emmeans, include=FALSE, message=FALSE}
+
+parental_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+write.csv(
+  parental_emm,
+  "PL_parental_emmeans.csv",
+  row.names = FALSE
+)
+
+interaction_emm <- purrr::map_dfr(
+  names(models),
+  function(trait_name){
+
+    tryCatch({
+
+      as.data.frame(
+        emmeans(
+          models[[trait_name]],
+          ~ trat * clip,
+          type = "response"
+        )
+      ) %>%
+        mutate(
+          trait = trait_name,
+          .before = 1
+        )
+
+    }, error = function(e){
+
+      tibble(
+        trait = trait_name
+      )
+
+    })
+
+  }
+)
+
+
+write.csv(
+  interaction_emm,
+  "PL_interaction_emmeans.csv",
+  row.names = FALSE
+)
+```
+
