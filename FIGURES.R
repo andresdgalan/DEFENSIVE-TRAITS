@@ -179,6 +179,11 @@ interaction_heatmap <- bind_rows(
   ME_interaction_heatmap
 )
 
+# Guardar las tablas unidas
+write.table(parental_heatmap, file = "parental_heatmap.csv", row.names = F, sep = ",")
+write.table(clipping_heatmap, file = "clipping_heatmap.csv", row.names = F, sep = ",")
+write.table(interaction_heatmap, file = "interaction_heatmap.csv", row.names = F, sep = ",")
+
 ###############################################################################
 # 5. ORDEN DE LOS RASGOS
 #

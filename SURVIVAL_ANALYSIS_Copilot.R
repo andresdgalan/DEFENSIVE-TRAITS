@@ -1,6 +1,6 @@
-############################################################
 # Survival analyses
-############################################################
+
+# Load data and packages ----
 
 library(tidyverse)
 library(survival)
@@ -110,3 +110,319 @@ p_speciesXparental <- ggsurvplot_facet(
 )
 
 p_speciesXparental
+
+png("Fig_Kaplan_Meier_parental.png", width = 16, height = 10, units = "in", res = 600)
+print(p_parental)
+dev.off()
+
+
+png("Fig_Kaplan_Meier_species.png", width = 16, height = 10, units = "in", res = 600)
+print(p_species)
+dev.off()
+
+png("Fig_Kaplan_Meier_speciesXparental.png", width = 16, height = 10, units = "in", res = 600)
+print(p_speciesXparental)
+dev.off()
+
+# LOG-RANK TESTS ----
+
+# Species effect
+
+log_rank_species <- survdiff(
+  Surv(drought_survival, status) ~ sp,
+  data = data_surv
+)
+
+log_rank_species
+
+# Parental effect
+
+log_rank_parental <- survdiff(
+  Surv(drought_survival, status) ~ trat,
+  data = data_surv
+)
+
+log_rank_parental
+
+# Clipping effect
+
+log_rank_clipping <- survdiff(
+  Surv(drought_survival, status) ~ clip,
+  data = data_surv
+)
+
+log_rank_clipping
+
+
+# Cox proportional hadards model ----
+
+cox_full <- coxph(
+  
+  Surv(drought_survival, status) ~
+    
+    sp * trat * clip,
+  
+  data = data_surv
+  
+)
+
+summary(cox_full)
+
+# ANOVA
+anova(cox_full)
+
+# Publication ready Hazard ratio table
+
+cox_table <- tidy(
+  cox_full,
+  exponentiate = TRUE,
+  conf.int = TRUE
+)
+
+cox_table
+
+# Check proportional hazards assumption
+
+ph_test <- cox.zph(cox_full)
+
+ph_test
+
+plot(ph_test)
+
+
+# TRAIT-BASED SURVIVAL ANALYSIS ----
+
+traits <- c(
+  
+  "flor",
+  "fruto",
+  "seedtotal",
+  "seedfruto",
+  "massseed",
+  "hojas",
+  "altura",
+  "biomass",
+  "dias_flor",
+  "dias_fruto",
+  "periodo_flor",
+  "periodo_fruto",
+  "SLA",
+  "LDMC",
+  "area.m",
+  "Photosyn",
+  "Conductance",
+  "PhiPS2",
+  "fenoles",
+  "AvgDiam.mm.",
+  "RTD",
+  "SRL"             # HE QUITADO LOS RASGOS RADICULARES PQ AFECTABAN CON ORDENES DE MAGNITUD DIFERENTES Y EN REALIDAD LOS RASGOS RADICULARES ESTÁN AFECTADOS POR LA SEQUÍA AL HABERSE TOMADO DESPUÉS
+  
+)
+
+# Univariate Cox models
+
+trait_results <- map_dfr(
+  
+  traits,
+  
+  function(tr){
+    
+    form <- as.formula(
+      
+      paste0(
+        "Surv(drought_survival, status) ~ `",
+        tr,
+        "`"
+      )
+      
+    )
+    
+    d <- data_surv %>%
+      filter(!is.na(.data[[tr]]))
+    
+    if(nrow(d) < 20){
+      
+      return(NULL)
+      
+    }
+    
+    mod <- coxph(
+      form,
+      data = d
+    )
+    
+    tidy(
+      mod,
+      exponentiate = TRUE,
+      conf.int = TRUE
+    ) %>%
+      
+      mutate(
+        trait = tr
+      )
+    
+  }
+  
+)
+
+
+# MULTIPLE-TESTING CORRECTION
+trait_results <- trait_results %>%
+  
+  mutate(
+    
+    p_fdr =
+      p.adjust(
+        p.value,
+        method = "fdr"
+      )
+    
+  )
+
+trait_results
+
+
+# FOREST PLOT OF TRAIT EFFECTS
+
+trait_results %>%
+  
+  mutate(
+    trait = reorder(trait, estimate)
+  ) %>%
+  
+  ggplot(
+    aes(
+      estimate,
+      trait
+    )
+  ) +
+  
+  geom_vline(
+    xintercept = 1,
+    linetype = 2
+  ) +
+  
+  geom_point(
+    size = 3
+  ) +
+  
+  geom_errorbar(
+    aes(
+      xmin = conf.low,
+      xmax = conf.high
+    ),
+    height = 0
+  ) +
+  
+  theme_classic(base_size = 14) +
+  
+  labs(
+    x = "Hazard ratio",
+    y = NULL
+  )
+
+
+# TRAIT MODELS CONTROLING FOR SPECIES ----
+
+trait_results_species <- map_dfr(
+  
+  traits,
+  
+  function(tr){
+    
+    form <- as.formula(
+      
+      paste0(
+        "Surv(drought_survival, status) ~ sp + `",
+        tr,
+        "`"
+      )
+      
+    )
+    
+    d <- data_surv %>%
+      filter(!is.na(.data[[tr]]))
+    
+    if(nrow(d) < 20){
+      
+      return(NULL)
+      
+    }
+    
+    mod <- coxph(
+      form,
+      data = d
+    )
+    
+    tidy(
+      mod,
+      exponentiate = TRUE,
+      conf.int = TRUE
+    ) %>%
+      
+      filter(term == tr) %>%
+      
+      mutate(
+        trait = tr
+      )
+    
+  }
+  
+)
+
+# MULTIPLE-TESTING CORRECTION
+trait_results_species <- trait_results_species %>%
+  
+  mutate(
+    
+    p_fdr =
+      p.adjust(
+        p.value,
+        method = "fdr"
+      )
+    
+  )
+
+trait_results_species
+
+
+# FOREST PLOT OF TRAIT EFFECTS
+
+trait_results_species %>%
+  
+  mutate(
+    trait = reorder(trait, estimate)
+  ) %>%
+  
+  ggplot(
+    aes(
+      estimate,
+      trait
+    )
+  ) +
+  
+  geom_vline(
+    xintercept = 1,
+    linetype = 2
+  ) +
+  
+  geom_point(
+    size = 3
+  ) +
+  
+  geom_errorbar(
+    aes(
+      xmin = conf.low,
+      xmax = conf.high
+    ),
+    height = 0
+  ) +
+  
+  theme_classic(base_size = 14) +
+  
+  labs(
+    x = "Hazard ratio",
+    y = NULL
+  )
+
+

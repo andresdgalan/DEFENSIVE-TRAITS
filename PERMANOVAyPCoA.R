@@ -41,9 +41,14 @@ traits <- read.table(here("trait_data.csv"), header =T, sep = ",")%>%
 traits <- traits %>%
        filter(rowSums(!is.na(.)) > 7)
 
-# Calculamos, para cada pareja, el número de rasgos comparables
-n <- nrow(traits)
+############################################################
+# 1. Separar metadatos y rasgos
+############################################################
 
+X <- traits %>%
+  select(-c(Species, Parental, id, clip))
+
+# Calculamos, para cada pareja, el número de rasgos comparables
 n <- nrow(X)
 
 shared <- matrix(
@@ -77,16 +82,13 @@ table(shared_upper)
 which(shared == 0, arr.ind = TRUE)
 
 traits <- traits[-260,]
-
-############################################################
-# 1. Separar metadatos y rasgos
-############################################################
+X <- X[-260,]
 
 meta <- traits %>%
   select(Species, Parental, id)
 
-X <- traits %>%
-  select(-c(Species, Parental, id, clip))
+
+
 
 ############################################################
 # 2. Estandarizar rasgos
