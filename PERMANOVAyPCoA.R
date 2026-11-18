@@ -16,6 +16,12 @@ traits <- read.table(here("trait_data.csv"), header =T, sep = ",")%>%
   select(-c(massmother, humedad_muerte, seedfruto, flor, seedtotal,
             dias_fruto, dias_fin_fruto, dias_muerte)) %>%
   rename(Species = sp, Parental = trat)
+  # mutate(
+  #   periodo_flor =
+  #     dias_fin_flor - dias_flor
+  # ) %>%
+  # select(-dias_fin_flor)
+
 
 # FILTRAMOS POR MISSINGNESS
 # PRIMERO QUITAMOS VARIABLES CON POCOS DATOS Y VARIABLES CORRELACIONADAS
@@ -267,15 +273,15 @@ ggplot(
     alpha = 0.8
   ) +
   
-  stat_ellipse(
-    aes(
-      colour = Species,
-      linetype = Parental,
-      group = interaction(Species, Parental)
-    ),
-    linewidth = 1,
-    level = 0.95
-  ) +
+  # stat_ellipse(
+  #   aes(
+  #     colour = Species,
+  #     linetype = Parental,
+  #     group = interaction(Species, Parental)
+  #   ),
+  #   linewidth = 1,
+  #   level = 0.95
+  # ) +
   
   geom_segment(
     data = vec.sig,

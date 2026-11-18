@@ -307,7 +307,7 @@ ggsave(
 ###############################################################################
 
 traits_parental <- c(
-  "SLA",
+  "LDMC",
   "fenoles",
   "dias_flor",
   "PhiPS2",
@@ -383,7 +383,7 @@ ggsave(
 traits_interaction <- c(
   "SLA",
   "SRL",
-  "PhiPS2"
+  "Conductance"
 )
 
 Figure3_data <- interaction_emm %>%

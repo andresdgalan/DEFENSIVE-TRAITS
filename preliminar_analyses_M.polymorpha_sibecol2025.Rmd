@@ -2624,3 +2624,26 @@ write.csv(
   row.names = FALSE
 )
 ```
+
+```{r Exportar resultados de Anovas, include=FALSE, message=FALSE}
+anova_objects <- ls(pattern = "^anova_")
+
+species_code <- "ME"
+
+for(obj in anova_objects){
+
+  saveRDS(
+    get(obj),
+    file = here(
+      "anova_rds",
+      paste0(
+        species_code,
+        "_",
+        obj,
+        ".rds"
+      )
+    )
+  )
+
+}
+```
