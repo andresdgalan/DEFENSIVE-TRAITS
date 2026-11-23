@@ -186,43 +186,111 @@ write.table(interaction_heatmap, file = "interaction_heatmap.csv", row.names = F
 
 ###############################################################################
 # 5. ORDEN DE LOS RASGOS
-#
-# Modifica este vector si deseas otro orden.
 ###############################################################################
 
+library(dplyr)
+library(tidyr)
+
 trait_order <- c(
-  "flor",
-  "fruto",
-  "seedtotal",
-  "seedfruto",
-  "massseed",
-  "hojas",
-  "altura",
-  "biomass",
-  "dias_flor",
-  "dias_fruto",
-  "periodo_flor",
-  "periodo_fruto",
+  "Plant height",
+  "Aboveground biomass",
+  "Leaf number",
+  "Seed number",
+  "Seed mass",
+  "Leaf area",
   "SLA",
   "LDMC",
-  "area.m",
-  "Photosyn",
+  "Root diameter",
+  "SRL",
+  "Photosynthesis",
   "Conductance",
-  "PhiPS2",
-  "fenoles",
-  "AvgDiam.mm.",
-  "RTD",
-  "SRL"
+  "PhiPSII",
+  "Flowering start",
+  "Flowering period",
+  "Flowering end",
+  "Leaf phenolics"
 )
 
-parental_heatmap$trait    <- factor(parental_heatmap$trait,
-                                    levels = rev(trait_order))
+trait_labels <- c(
+  hojas        = "Leaf number",
+  altura       = "Plant height",
+  massseed     = "Seed mass",
+  area.m       = "Leaf area",
+  Photosyn     = "Photosynthesis",
+  fenoles      = "Leaf phenolics",
+  dias_flor    = "Flowering start",
+  periodo_flor = "Flowering period",
+  dias_fin_flor= "Flowering end",
+  biomass      = "Aboveground biomass",
+  AvgDiam.mm.  = "Root diameter",
+  seedtotal    = "Seed number",
+  SLA          = "SLA",
+  LDMC         = "LDMC",
+  SRL          = "SRL",
+  Conductance  = "Conductance",
+  PhiPS2       = "PhiPSII"
+)
 
-clipping_heatmap$trait    <- factor(clipping_heatmap$trait,
-                                    levels = rev(trait_order))
+species_labels <- c(
+  AV = "A. barbata",
+  HO = "H. murinum",
+  PL = "P. lagopus",
+  CA = "C. arvensis",
+  ME = "M. polymorpha"
+)
 
-interaction_heatmap$trait <- factor(interaction_heatmap$trait,
-                                    levels = rev(trait_order))
+species_order <- c(
+  "A. barbata",
+  "H. murinum",
+  "P. lagopus",
+  "C. arvensis",
+  "M. polymorpha"
+)
+
+for(df_name in c("parental_heatmap",
+                 "clipping_heatmap")) {
+  
+  df <- get(df_name)
+  
+  # nombres de rasgos
+  df$trait <- recode(df$trait, !!!trait_labels)
+  
+  # nombres de especies
+  df$species <- recode(df$species, !!!species_labels)
+  
+  # completar combinaciones faltantes especie × rasgo
+  df <- df %>%
+    complete(
+      species = species_order,
+      trait = trait_order,
+      fill = list(
+        effect = NA_real_,
+        pvalue = NA_real_,
+        symbol = NA_character_
+      )
+    )
+  
+  # ordenar factores
+  df$trait <- factor(
+    df$trait,
+    levels = rev(trait_order)
+  )
+  
+  df$species <- factor(
+    df$species,
+    levels = species_order
+  )
+  
+  assign(df_name, df)
+}
+
+# quitamos rasgos que no entran en la selección
+parental_heatmap <- parental_heatmap %>%
+  filter(!is.na(trait))
+
+clipping_heatmap <- clipping_heatmap %>%
+  filter(!is.na(trait))
+
 
 ###############################################################################
 # 6. FIGURA 1
@@ -236,7 +304,33 @@ heatmap_theme <- theme_bw(base_size = 12) +
     axis.title = element_blank(),
     legend.position = "right",
     strip.background = element_blank(),
-    strip.text = element_text(face = "bold")
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      vjust = 1,
+      face = "italic"
+    )
+  )
+
+fill_limit <- 100
+
+parental_heatmap <- parental_heatmap %>%
+  mutate(
+    symbol = ifelse(
+      abs(effect) > fill_limit,
+      paste0(symbol, "\n", round(effect), "%"),
+      symbol
+    )
+  )
+
+clipping_heatmap <- clipping_heatmap %>%
+  mutate(
+    symbol = ifelse(
+      abs(effect) > fill_limit,
+      paste0(symbol, "\n", round(effect), "%"),
+      symbol
+    )
   )
 
 p_parental <- ggplot(
@@ -250,6 +344,10 @@ p_parental <- ggplot(
     mid = "white",
     high = "#B2182B",
     midpoint = 0,
+    limits = c(-fill_limit, fill_limit),
+    oob = scales::squish,
+    breaks = c(-100, -50, 0, 50, 100),
+    labels = c("≤−100", "−50", "0", "50", "≥100"),
     name = "% change"
   ) +
   labs(title = "Parental grazing") +
@@ -266,34 +364,33 @@ p_clipping <- ggplot(
     mid = "white",
     high = "#B2182B",
     midpoint = 0,
+    limits = c(-fill_limit, fill_limit),
+    oob = scales::squish,
+    breaks = c(-100, -50, 0, 50, 100),
+    labels = c("≤−100", "−50", "0", "50", "≥100"),
     name = "% change"
   ) +
-  labs(title = "Within-generation clipping") +
-  heatmap_theme
+  labs(title = "Within-generation grazing") +
+  heatmap_theme +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank()
+  )
 
-p_interaction <- ggplot(
-  interaction_heatmap,
-  aes(species, trait, fill = effect)
-) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = symbol), size = 4) +
-  scale_fill_gradient2(
-    low = "#2166AC",
-    mid = "white",
-    high = "#B2182B",
-    midpoint = 0,
-    name = "% change"
-  ) +
-  labs(title = "Interaction") +
-  heatmap_theme
-
-Figure1 <- p_parental + p_clipping + p_interaction +
-  plot_layout(ncol = 3)
+Figure1 <- p_parental + p_clipping +
+  plot_layout(
+    ncol = 2,
+    guides = "collect"
+  ) &
+  theme(
+    legend.position = "right"
+  )
+Figure1
 
 ggsave(
   "Figure1_heatmaps.png",
   Figure1,
-  width = 16,
+  width = 8,
   height = 10,
   dpi = 600
 )
@@ -376,24 +473,140 @@ ggsave(
 # 8. FIGURA 3
 #
 # INTERACCIONES
-#
-# Solo SLA, SRL y PhiPS2
 ###############################################################################
 
 traits_interaction <- c(
-  "SLA",
-  "SRL",
-  "Conductance"
+  "SLA (cm²/g)",
+  "SRL (m/g)",
+  "Conductance (mmol/m²s)",
+  "Flowering period (days)",
+  "Seed number",
+  "Aboveground biomass (g)",
+  "Leaf number",
+  "LDMC (mg/g)"
 )
 
+interaction_emm <- interaction_emm %>%
+  mutate(
+    trait = case_when(
+      trait == "hojas" ~ "Leaf number",
+      trait == "massseed" ~ "Plant height",
+      trait == "Photosyn" ~ "Photosynthesis",
+      trait == "fenoles" ~ "Leaf phenolics",
+      trait == "dias_flor" ~ "Flowering start",
+      trait == "dias_fin_flor" ~ "Flowering end",
+      trait == "periodo_flor" ~ "Flowering period (days)",
+      trait == "biomass" ~ "Aboveground biomass (g)",
+      trait == "AvgDiam.mm." ~ "Root diameter",
+      trait == "SLA" ~ "SLA (cm²/g)",
+      trait == "Conductance" ~ "Conductance (mmol/m²s)",
+      trait == "SRL" ~ "SRL (m/g)",
+      trait == "seedtotal" ~ "Seed number",
+      trait == "LDMC" ~ "LDMC (mg/g)",
+      TRUE ~ trait
+    ),
+    species = case_when(
+      species == "AV" ~ "A. barbata",
+      species == "HO" ~ "H. murinum",
+      species == "PL" ~ "P. lagopus",
+      species == "CA" ~ "C. arvensis",
+      species == "ME" ~ "M. polymorpha",
+      TRUE ~ species
+    ),
+    clip = case_when(
+      clip == "no" ~ "Unclipped",
+      clip == "yes" ~ "Clipped",
+      TRUE ~ as.character(clip)
+    )
+  )
+
+interaction_heatmap <- interaction_heatmap %>%
+  mutate(
+    trait = case_when(
+      trait == "hojas" ~ "Leaf number",
+      trait == "massseed" ~ "Plant height",
+      trait == "Photosyn" ~ "Photosynthesis",
+      trait == "fenoles" ~ "Leaf phenolics",
+      trait == "dias_flor" ~ "Flowering start",
+      trait == "dias_fin_flor" ~ "Flowering end",
+      trait == "periodo_flor" ~ "Flowering period (days)",
+      trait == "biomass" ~ "Aboveground biomass (g)",
+      trait == "AvgDiam.mm." ~ "Root diameter",
+      trait == "SLA" ~ "SLA (cm²/g)",
+      trait == "Conductance" ~ "Conductance (mmol/m²s)",
+      trait == "SRL" ~ "SRL (m/g)",
+      trait == "seedtotal" ~ "Seed number",
+      trait == "LDMC" ~ "LDMC (mg/g)",
+      TRUE ~ trait
+    ),
+    species = case_when(
+      species == "AV" ~ "A. barbata",
+      species == "HO" ~ "H. murinum",
+      species == "PL" ~ "P. lagopus",
+      species == "CA" ~ "C. arvensis",
+      species == "ME" ~ "M. polymorpha",
+      TRUE ~ species
+    )
+  )
+
+interaction_heatmap <- interaction_heatmap %>%
+  mutate(
+    trait = factor(
+      trait,
+      levels = c(
+        "Aboveground biomass (g)",
+        "Leaf number",
+        "Seed number",
+        "SLA (cm²/g)",
+        "LDMC (mg/g)",
+        "SRL (m/g)",
+        "Conductance (mmol/m²s)",
+        "Flowering period (days)"
+      )
+    )
+  )
+
 Figure3_data <- interaction_emm %>%
-  filter(trait %in% traits_interaction)
+  filter(trait %in% traits_interaction)%>%
+  mutate(
+    trait = factor(
+      trait,
+      levels = c(
+        "Aboveground biomass (g)",
+        "Leaf number",
+        "Seed number",
+        "SLA (cm²/g)",
+        "LDMC (mg/g)",
+        "SRL (m/g)",
+        "Conductance (mmol/m²s)",
+        "Flowering period (days)"
+      )
+    )
+  )
+
+sig_labels <- interaction_heatmap %>%
+  filter(
+    trait %in% traits_interaction,
+    symbol != ""
+  ) %>%
+  left_join(
+    Figure3_data %>%
+      group_by(trait, species) %>%
+      summarise(
+        y = max(upper, na.rm = TRUE) * 1.08,
+        .groups = "drop"
+      ),
+    by = c("trait", "species")
+  ) %>%
+  mutate(
+    x = 1.5
+  )
 
 Figure3 <- ggplot(
   Figure3_data,
   aes(
-    clip,
-    value,
+    x = clip,
+    y = value,
     colour = trat,
     group = trat
   )
@@ -406,6 +619,18 @@ Figure3 <- ggplot(
       ymax = upper
     ),
     width = 0.08
+  ) +
+  geom_text(
+    data = sig_labels,
+    aes(
+      x = x,
+      y = y,
+      label = symbol
+    ),
+    inherit.aes = FALSE,
+    colour = "black",
+    size = 4.5,
+    fontface = "bold"
   ) +
   facet_grid(
     trait ~ species,
@@ -428,15 +653,17 @@ Figure3 <- ggplot(
   ) +
   labs(
     x = "Within-generation clipping",
-    y = "Estimated marginal mean",
+    y = "Estimated marginal mean (95% CI)",
     colour = ""
   )
+
+Figure3
 
 ggsave(
   "Figure3_interactions.png",
   Figure3,
-  width = 15,
-  height = 9,
+  width = 9,
+  height = 15,
   dpi = 600
 )
 
