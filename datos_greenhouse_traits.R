@@ -107,6 +107,23 @@ for (species in sp) {
 
 library(corrplot)
 
+trait_data <- trait_data%>%
+  mutate(
+    "Flowering period" =
+      dias_fin_flor - dias_flor,
+    "Fruiting period" =
+      dias_fin_fruto - dias_fruto)%>%
+  rename("Leaf number" = hojas, "Fruit number" = fruto, "Flower number" = flor, "Plant height" = altura,
+         "Seed mass" = massseed, "Seeds/fruit" = seedfruto, "Leaf area" = area.m, 
+         "Photosynthesis" = Photosyn, "Leaf phenolics" = fenoles, "PhiPSII" = PhiPS2,
+         "Flowering onset" = dias_flor, "Fruiting onset" = dias_fruto, "Flowering end" = dias_fin_flor, "Fruiting end" = dias_fin_fruto,
+         "Aboveground biomass" = biomass, "Root diameter" = AvgDiam.mm.,
+         "Seed number" = seedtotal) %>%
+  select("Plant height", "Aboveground biomass", "Leaf number", "Flower number", "Fruit number", "Seed number",
+         "Seed mass", "Leaf area", "SLA", "LDMC", "Root diameter", "RTD", "SRL", "Photosynthesis",
+         "Conductance", "PhiPSII", "Flowering onset", "Fruiting onset", "Flowering period", "Fruiting period", "Flowering end", "Fruiting end",
+         "Leaf phenolics")
+
 # Seleccionar variables numéricas
 numeric_vars <- trait_data[, sapply(trait_data, is.numeric)]
 

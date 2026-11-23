@@ -10,17 +10,37 @@ library(cluster)
 library(ape)
 library(grid)
 library(here)
+library(ggrepel)
 
 # datos
 traits <- read.table(here("trait_data.csv"), header =T, sep = ",")%>%
-  select(-c(massmother, humedad_muerte, seedfruto, flor, seedtotal,
-            dias_fruto, dias_fin_fruto, dias_muerte)) %>%
-  rename(Species = sp, Parental = trat)
-  # mutate(
-  #   periodo_flor =
-  #     dias_fin_flor - dias_flor
-  # ) %>%
-  # select(-dias_fin_flor)
+  select(-c(massmother, humedad_muerte, fruto, flor,
+            dias_fruto, dias_fin_fruto, dias_muerte, RTD, seedfruto)) %>%
+  mutate(
+    "Flowering period" =
+      dias_fin_flor - dias_flor,
+    "trat" = 
+      ifelse(trat == "gra", "Grazed", "Ungrazed"),
+    "sp" = case_when(
+      sp == "AV" ~ "A. barbata",
+      sp == "HO"  ~ "H. murinum",
+      sp == "PL"  ~ "P. lagopus",
+      sp == "CA"  ~ "C. arvensis",
+      sp == "ME"  ~ "M. polymorpha",
+      TRUE ~ sp # Mantiene cualquier otro valor intacto (ej. NAs)
+    )) %>%
+  rename(Species = sp, "Parental grazing" = trat, 
+         "Leaf number" = hojas, "Plant height" = altura,
+         "Seed mass" = massseed, "Leaf area" = area.m, 
+         "Photosynthesis" = Photosyn, "Leaf phenolics" = fenoles,
+         "Flowering start" = dias_flor, "Flowering end" = dias_fin_flor,
+         "Aboveground biomass" = biomass, "Root diameter" = AvgDiam.mm.,
+         "Seed number" = seedtotal) %>%
+  select("id", "Species", "Parental grazing", "clip", "Plant height", "Aboveground biomass", "Leaf number", "Seed number",
+         "Seed mass", "Leaf area", "SLA", "LDMC", "Root diameter", "SRL", "Photosynthesis",
+         "Conductance", "PhiPS2", "Flowering start", "Flowering period", "Flowering end",
+         "Leaf phenolics") # Esto es solo para ordenar las columnas
+
 
 
 # FILTRAMOS POR MISSINGNESS
@@ -52,7 +72,7 @@ traits <- traits %>%
 ############################################################
 
 X <- traits %>%
-  select(-c(Species, Parental, id, clip))
+  select(-c(Species, "Parental grazing", id, clip))
 
 # Calculamos, para cada pareja, el número de rasgos comparables
 n <- nrow(X)
@@ -91,7 +111,7 @@ traits <- traits[-260,]
 X <- X[-260,]
 
 meta <- traits %>%
-  select(Species, Parental, id)
+  select(Species, "Parental grazing", id)
 
 
 
@@ -117,7 +137,7 @@ dist.mat <- daisy(
 ############################################################
 
 perm <- adonis2(
-  dist.mat ~ Species * Parental,
+  dist.mat ~ Species * `Parental grazing`,
   data = meta,
   permutations = 999
 )
@@ -125,7 +145,7 @@ perm <- adonis2(
 print(perm)
 
 perm.terms <- adonis2(
-  dist.mat ~ Species * Parental,
+  dist.mat ~ Species * `Parental grazing`,
   data = meta,
   permutations = 999,
   by = "terms"
@@ -134,7 +154,7 @@ perm.terms <- adonis2(
 print(perm.terms)
 
 perm.margin <- adonis2(
-  dist.mat ~ Species * Parental,
+  dist.mat ~ Species * `Parental grazing`,
   data = meta,
   permutations = 999,
   by = "margin"
@@ -171,7 +191,7 @@ permutest(beta.species)
 
 beta.parental <- betadisper(
   dist.mat,
-  meta$Parental
+  meta$"Parental grazing"
 )
 
 permutest(beta.parental)
@@ -196,7 +216,17 @@ scores <- as.data.frame(
 
 colnames(scores) <- c("PCoA1", "PCoA2")
 
-scores <- bind_cols(scores, meta)
+# Orden consistente para todas las figuras
+species_order <- c(
+  "A. barbata",
+  "C. arvensis",
+  "M. polymorpha",
+  "H. murinum",
+  "P. lagopus"
+)
+
+scores <- bind_cols(scores, meta)%>%
+  mutate(sp   = factor(sp, levels = species_order))
 
 ############################################################
 # 8. Porcentaje de varianza explicada
@@ -258,13 +288,31 @@ vec.sig$Dim2 <- vec.sig$Axis.2 * mult
 # 13. Gráfico
 ############################################################
 
+
+
+species_cols <- c(
+  "A. barbata" = "#2F9C95", 
+  "C. arvensis" = "#E69F00",  
+  "M. polymorpha" = "#CC79A7",  
+  "H. murinum" = "#003F5C",  
+  "P. lagopus" = "#C0392B"   
+)
+
+offset <- 0.02
+
+vec.sig.lab <- vec.sig |>
+  mutate(
+    lab_x = Dim1 + ifelse(Dim1 >= 0, offset, -offset),
+    lab_y = Dim2 + ifelse(Dim2 >= 0, offset, -offset)
+  )
+
 ggplot(
   scores,
   aes(
     x = PCoA1,
     y = PCoA2,
     colour = Species,
-    shape = Parental
+    shape = `Parental grazing`
   )
 ) +
   
@@ -276,8 +324,8 @@ ggplot(
   # stat_ellipse(
   #   aes(
   #     colour = Species,
-  #     linetype = Parental,
-  #     group = interaction(Species, Parental)
+  #     linetype = "Parental grazing",
+  #     group = interaction(Species, "Parental grazing")
   #   ),
   #   linewidth = 1,
   #   level = 0.95
@@ -305,15 +353,21 @@ ggplot(
     )
   ) +
   
-  geom_text(
-    data = vec.sig,
+  scale_colour_manual(
+    values = species_cols
+  ) +
+
+
+  geom_text_repel(
+    data = vec.sig.lab,
     aes(
-      x = Dim1,
-      y = Dim2,
+      x = lab_x,
+      y = lab_y,
       label = Trait
     ),
-    inherit.aes = FALSE,
-    size = 3.5
+    segment.color = "grey50",
+    max.overlaps = Inf,
+    inherit.aes = FALSE
   ) +
   
   # geom_text(
@@ -336,7 +390,14 @@ ggplot(
       "%)"
     ),
     colour = "Species",
-    shape = "Parental"
+    shape = "Parental grazing"
+  ) +
+  
+  guides(
+    colour = guide_legend(
+      override.aes = list(),
+      label.theme = element_text(face = "italic")
+    )
   )
 
 ############################################################
