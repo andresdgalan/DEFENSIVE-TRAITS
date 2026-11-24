@@ -1319,6 +1319,8 @@ p_traits_survival <- ggplot(
 
 p_traits_survival
 
+
 png("Fig_trait_survival.png", width = 15, height = 8, units = "in", res = 600)
 print(p_traits_survival)
 dev.off()
+
