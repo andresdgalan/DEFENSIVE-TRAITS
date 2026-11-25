@@ -669,11 +669,6 @@ p_speciesXclipping
 
 
 # EXPORTAR
-png("Fig_Kaplan_Meier_parental.png", width = 16, height = 10, units = "in", res = 600)
-print(p_parental)
-dev.off()
-
-
 png("Fig_Kaplan_Meier_species.png", width = 12, height = 8, units = "in", res = 600)
 print(p_species)
 dev.off()
@@ -885,6 +880,14 @@ traits <- c(
 
 response <- "drought_survival"
 
+# estandarizamos predictores para comparar coeficientes
+trait_data_surv_std <- trait_data_surv %>%
+  mutate(
+    across(
+      all_of(traits),
+      scale
+    )
+  )
 
 #----------------------------------------
 # Ajustar modelos y extraer resultados
@@ -894,7 +897,7 @@ results_table <- map_dfr(traits, function(tr){
   
   form <- reformulate(tr, response)
   
-  mod <- lm(form, data = trait_data_surv)
+  mod <- lm(form, data = trait_data_surv_std)
   
   coef_tab <- summary(mod)$coefficients
   
@@ -931,7 +934,7 @@ results_table <- map_dfr(traits, function(tr){
     as.formula(
       paste(response, "~", tr)
     ),
-    data = trait_data_surv
+    data = trait_data_surv_std
   )
   
   coef_tab <- summary(mod)$coefficients
@@ -995,7 +998,7 @@ models <- setNames(
     
     lm(
       reformulate(tr, response),
-      data = trait_data_surv
+      data = trait_data_surv_std
     )
     
   }),

@@ -136,31 +136,18 @@ dist.mat <- daisy(
 # 4. PERMANOVA
 ############################################################
 
-perm <- adonis2(
-  dist.mat ~ Species * `Parental grazing`,
-  data = meta,
-  permutations = 999
-)
+set.seed(123)
 
-print(perm)
 
 perm.terms <- adonis2(
   dist.mat ~ Species * `Parental grazing`,
   data = meta,
-  permutations = 999,
+  permutations = 9999,
   by = "terms"
 )
 
 print(perm.terms)
 
-perm.margin <- adonis2(
-  dist.mat ~ Species * `Parental grazing`,
-  data = meta,
-  permutations = 999,
-  by = "margin"
-)
-
-print(perm.margin)
 
 # Multivariate trait composition differed among species (R² = 0.54, p = 0.001), 
 # was weakly affected by parental treatment (R² = 0.015, p = 0.001), 
@@ -226,7 +213,7 @@ species_order <- c(
 )
 
 scores <- bind_cols(scores, meta)%>%
-  mutate(sp   = factor(sp, levels = species_order))
+  mutate(Species   = factor(Species, levels = species_order))
 
 ############################################################
 # 8. Porcentaje de varianza explicada
@@ -249,7 +236,7 @@ var2 <- round(
 fit <- envfit(
   pcoa.res$vectors[, 1:2],
   as.data.frame(X.scaled),
-  permutations = 999,
+  permutations = 9999,
   na.rm = T
 )
 
@@ -272,7 +259,7 @@ vec$Trait <- rownames(vec)
 vec$pval <- fit$vectors$pvals
 
 vec.sig <- vec %>%
-  filter(pval < 0.05)
+  filter(pval <= 0.05)
 
 
 ############################################################

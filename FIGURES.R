@@ -205,7 +205,7 @@ trait_order <- c(
   "Photosynthesis",
   "Conductance",
   "PhiPSII",
-  "Flowering start",
+  "Flowering onset",
   "Flowering period",
   "Flowering end",
   "Leaf phenolics"
@@ -218,7 +218,7 @@ trait_labels <- c(
   area.m       = "Leaf area",
   Photosyn     = "Photosynthesis",
   fenoles      = "Leaf phenolics",
-  dias_flor    = "Flowering start",
+  dias_flor    = "Flowering onset",
   periodo_flor = "Flowering period",
   dias_fin_flor= "Flowering end",
   biomass      = "Aboveground biomass",
@@ -241,10 +241,10 @@ species_labels <- c(
 
 species_order <- c(
   "A. barbata",
-  "H. murinum",
-  "P. lagopus",
   "C. arvensis",
-  "M. polymorpha"
+  "M. polymorpha",
+  "H. murinum",
+  "P. lagopus"
 )
 
 for(df_name in c("parental_heatmap",
@@ -493,7 +493,7 @@ interaction_emm <- interaction_emm %>%
       trait == "massseed" ~ "Plant height",
       trait == "Photosyn" ~ "Photosynthesis",
       trait == "fenoles" ~ "Leaf phenolics",
-      trait == "dias_flor" ~ "Flowering start",
+      trait == "dias_flor" ~ "Flowering onset",
       trait == "dias_fin_flor" ~ "Flowering end",
       trait == "periodo_flor" ~ "Flowering period (days)",
       trait == "biomass" ~ "Aboveground biomass (g)",
@@ -527,7 +527,7 @@ interaction_heatmap <- interaction_heatmap %>%
       trait == "massseed" ~ "Plant height",
       trait == "Photosyn" ~ "Photosynthesis",
       trait == "fenoles" ~ "Leaf phenolics",
-      trait == "dias_flor" ~ "Flowering start",
+      trait == "dias_flor" ~ "Flowering onset",
       trait == "dias_fin_flor" ~ "Flowering end",
       trait == "periodo_flor" ~ "Flowering period (days)",
       trait == "biomass" ~ "Aboveground biomass (g)",
@@ -569,6 +569,8 @@ interaction_heatmap <- interaction_heatmap %>%
 Figure3_data <- interaction_emm %>%
   filter(trait %in% traits_interaction)%>%
   mutate(
+    species = factor(species, levels = species_order),
+    clip = factor(clip, levels = c("Unclipped", "Clipped")),
     trait = factor(
       trait,
       levels = c(
@@ -633,7 +635,7 @@ Figure3 <- ggplot(
     fontface = "bold"
   ) +
   facet_grid(
-    trait ~ species,
+    trait ~ factor(species, levels = species_order),
     scales = "free_y"
   ) +
   scale_colour_manual(
