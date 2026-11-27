@@ -148,6 +148,37 @@ perm.terms <- adonis2(
 
 print(perm.terms)
 
+# Como la interacción es significativa, hacemos un permanova
+# para cada especie, con parental de predictor
+
+species_levels <- levels(as.factor(meta$Species))
+
+dist_full <- as.matrix(dist.mat)
+
+perm_results <- map_dfr(species_levels, function(sp){
+  
+  idx <- meta$Species == sp
+  
+  dist_sp <- as.dist(
+    dist_full[idx, idx]
+  )
+  
+  res <- adonis2(
+    dist_sp ~ `Parental grazing`,
+    data = meta[idx, ],
+    permutations = 9999
+  )
+  
+  tibble(
+    Species = sp,
+    R2 = res$R2[1],
+    F = res$F[1],
+    p = res$`Pr(>F)`[1]
+  )
+})
+
+perm_results
+
 
 # Multivariate trait composition differed among species (R² = 0.54, p = 0.001), 
 # was weakly affected by parental treatment (R² = 0.015, p = 0.001), 
